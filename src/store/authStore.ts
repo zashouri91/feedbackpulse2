@@ -7,58 +7,49 @@ interface AuthState {
   error: string | null;
   loading: boolean;
   isInitialized: boolean;
+  isOffline: boolean;
   setUser: (user: User | null) => void;
   setError: (error: string | null) => void;
   setLoading: (loading: boolean) => void;
   setInitialized: (initialized: boolean) => void;
   clearUser: () => void;
-  retryAuth: () => Promise<void>;
-  isOffline: boolean;
 }
 
 export const useAuthStore = create<AuthState>()(
   persist(
-    (set, get) => ({
+    (set) => ({
       user: null,
       error: null,
       loading: true,
       isInitialized: false,
       isOffline: false,
-      setUser: user => set({ user, error: null }),
-      setError: error => {
+      setUser: (user) => {
+        console.log('Setting user in store:', user?.id);
+        set({ user, error: null, loading: false });
+      },
+      setError: (error) => {
         console.error('Auth error:', error);
         set({ error, loading: false });
       },
-      setLoading: loading => set({ loading }),
-      setInitialized: initialized => set({ isInitialized: initialized }),
-      clearUser: () => set({ user: null, error: null }),
-      retryAuth: async () => {
-        const state = get();
-        if (state.error) {
-          set({ loading: true, error: null });
-          try {
-            // Attempt to restore session from localStorage
-            const savedUser = localStorage.getItem('auth-user');
-            if (savedUser) {
-              const user = JSON.parse(savedUser);
-              set({ user, loading: false, error: null });
-            } else {
-              set({ loading: false });
-            }
-          } catch (error) {
-            set({
-              error: 'Failed to restore session',
-              loading: false,
-            });
-          }
-        }
+      setLoading: (loading) => set({ loading }),
+      setInitialized: (initialized) => set({ isInitialized: initialized }),
+      clearUser: () => {
+        console.log('Clearing user from store');
+        set({ user: null, error: null, loading: false });
       },
     }),
     {
       name: 'auth-store',
-      partialize: state => ({
+      partialize: (state) => ({
         user: state.user,
+        isInitialized: state.isInitialized,
       }),
+      // Add storage event listener to sync across tabs
+      onRehydrateStorage: () => (state) => {
+        if (state) {
+          console.log('Rehydrated auth store:', state.user?.id);
+        }
+      },
     }
   )
 );

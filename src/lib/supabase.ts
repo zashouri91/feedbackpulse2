@@ -4,9 +4,6 @@ import { Database } from '../types/database';
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-console.log('Supabase URL:', supabaseUrl);
-console.log('Supabase Key exists:', !!supabaseAnonKey);
-
 if (!supabaseUrl || !supabaseAnonKey) {
   throw new Error('Missing Supabase environment variables');
 }
@@ -15,21 +12,9 @@ export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
   auth: {
     autoRefreshToken: true,
     persistSession: true,
-    detectSessionInUrl: true,
-    storage: {
-      getItem: key => {
-        const item = window.localStorage.getItem(key);
-        console.log('Getting storage item:', key, item ? 'exists' : 'not found');
-        return item;
-      },
-      setItem: (key, value) => {
-        console.log('Setting storage item:', key);
-        window.localStorage.setItem(key, value);
-      },
-      removeItem: key => {
-        console.log('Removing storage item:', key);
-        window.localStorage.removeItem(key);
-      },
-    },
+    detectSessionInUrl: false,
+    storage: localStorage,
+    flowType: 'pkce',
+    debug: import.meta.env.DEV,
   },
 });
