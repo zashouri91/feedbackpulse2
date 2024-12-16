@@ -26,7 +26,7 @@ export const useUIStore = create<UIState>((set, get) => ({
   isLoading: false,
   toasts: [],
   globalError: null,
-  setLoading: (isLoading) => set({ isLoading }),
+  setLoading: isLoading => set({ isLoading }),
   showToast: (type, message, duration = DEFAULT_TOAST_DURATION) => {
     const id = Math.random().toString(36).substring(7);
     const toast: Toast = {
@@ -34,11 +34,11 @@ export const useUIStore = create<UIState>((set, get) => ({
       type,
       message,
       duration,
-      createdAt: Date.now()
+      createdAt: Date.now(),
     };
-    
-    set((state) => ({ 
-      toasts: [...state.toasts, toast] 
+
+    set(state => ({
+      toasts: [...state.toasts, toast],
     }));
 
     if (duration > 0) {
@@ -47,9 +47,10 @@ export const useUIStore = create<UIState>((set, get) => ({
       }, duration);
     }
   },
-  removeToast: (id) => set((state) => ({
-    toasts: state.toasts.filter((toast) => toast.id !== id)
-  })),
-  setGlobalError: (error) => set({ globalError: error }),
-  clearToasts: () => set({ toasts: [] })
+  removeToast: id =>
+    set(state => ({
+      toasts: state.toasts.filter(toast => toast.id !== id),
+    })),
+  setGlobalError: error => set({ globalError: error }),
+  clearToasts: () => set({ toasts: [] }),
 }));

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuthStore } from '../store/authStore';
 import type { Location } from '../types/organization';
@@ -10,9 +10,9 @@ export function useLocations() {
   const [isLoading, setIsLoading] = useState(true);
   const { user } = useAuthStore();
 
-  const fetchLocations = async () => {
+  const fetchLocations = useCallback(async () => {
     if (!user?.organizationId) return;
-    
+
     try {
       const { data, error } = await supabase
         .from('locations')
@@ -26,7 +26,7 @@ export function useLocations() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [user?.organizationId]);
 
   useEffect(() => {
     let channel: RealtimeChannel;
@@ -48,9 +48,9 @@ export function useLocations() {
             table: 'locations',
             filter: `organization_id=eq.${user.organizationId}`,
           },
-          (payload) => {
+          payload => {
             console.log('Location inserted:', payload);
-            setLocations((current) => [...current, payload.new as Location]);
+            setLocations(current => [...current, payload.new as Location]);
           }
         )
         .on(
@@ -61,12 +61,10 @@ export function useLocations() {
             table: 'locations',
             filter: `organization_id=eq.${user.organizationId}`,
           },
-          (payload) => {
+          payload => {
             console.log('Location updated:', payload);
-            setLocations((current) =>
-              current.map((loc) =>
-                loc.id === payload.new.id ? (payload.new as Location) : loc
-              )
+            setLocations(current =>
+              current.map(loc => (loc.id === payload.new.id ? (payload.new as Location) : loc))
             );
           }
         )
@@ -78,11 +76,9 @@ export function useLocations() {
             table: 'locations',
             filter: `organization_id=eq.${user.organizationId}`,
           },
-          (payload) => {
+          payload => {
             console.log('Location deleted:', payload);
-            setLocations((current) =>
-              current.filter((loc) => loc.id !== payload.old.id)
-            );
+            setLocations(current => current.filter(loc => loc.id !== payload.old.id));
           }
         )
         .subscribe();
@@ -95,7 +91,7 @@ export function useLocations() {
         supabase.removeChannel(channel);
       }
     };
-  }, [user?.organizationId]);
+  }, [user?.organizationId, fetchLocations]);
 
   const addLocation = async (locationData: Partial<Location>) => {
     if (!user?.organizationId) {
@@ -103,7 +99,7 @@ export function useLocations() {
     }
 
     setIsLoading(true);
-    
+
     // Create a temporary ID for optimistic update
     const tempId = generateId();
     const tempLocation = {
@@ -111,19 +107,21 @@ export function useLocations() {
       ...locationData,
       organization_id: user.organizationId,
       created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
+      updated_at: new Date().toISOString(),
     } as Location;
-    
+
     // Optimistically add the location
     setLocations(current => [...current, tempLocation]);
 
     try {
       const { data, error } = await supabase
         .from('locations')
-        .insert([{
-          ...locationData,
-          organization_id: user.organizationId
-        }])
+        .insert([
+          {
+            ...locationData,
+            organization_id: user.organizationId,
+          },
+        ])
         .select()
         .single();
 
@@ -134,10 +132,8 @@ export function useLocations() {
       }
 
       // Replace temp location with real one
-      setLocations(current => 
-        current.map(loc => loc.id === tempId ? data : loc)
-      );
-      
+      setLocations(current => current.map(loc => (loc.id === tempId ? data : loc)));
+
       return data;
     } catch (error) {
       console.error('Error adding location:', error);
@@ -153,13 +149,13 @@ export function useLocations() {
     }
 
     setIsLoading(true);
-    
+
     // Store the original location for rollback
     const originalLocation = locations.find(loc => loc.id === id);
-    
+
     // Optimistically update the location
     setLocations(current =>
-      current.map(loc => loc.id === id ? { ...loc, ...locationData } : loc)
+      current.map(loc => (loc.id === id ? { ...loc, ...locationData } : loc))
     );
 
     try {
@@ -174,9 +170,7 @@ export function useLocations() {
       if (error) {
         // Revert optimistic update on error
         if (originalLocation) {
-          setLocations(current =>
-            current.map(loc => loc.id === id ? originalLocation : loc)
-          );
+          setLocations(current => current.map(loc => (loc.id === id ? originalLocation : loc)));
         }
         throw error;
       }
@@ -196,10 +190,10 @@ export function useLocations() {
     }
 
     setIsLoading(true);
-    
+
     // Store the location for rollback
     const deletedLocation = locations.find(loc => loc.id === id);
-    
+
     // Optimistically remove the location
     setLocations(current => current.filter(loc => loc.id !== id));
 
@@ -224,6 +218,10 @@ export function useLocations() {
       setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchLocations();
+  }, [fetchLocations]);
 
   return {
     locations,

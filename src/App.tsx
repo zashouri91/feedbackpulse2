@@ -15,18 +15,16 @@ import Login from './pages/Login';
 import Landing from './pages/Landing';
 import { PasswordReset } from './components/auth/PasswordReset';
 import FeedbackPage from './pages/feedback/FeedbackPage';
-import { useAuthStore } from './store/authStore';
-import { LoadingSpinner } from './components/common/LoadingSpinner';
 import { useAuth } from './hooks/useAuth';
+import { LoadingSpinner } from './components/common/LoadingSpinner';
 
 function AppRoutes() {
-  const { isAuthenticated, isInitialized } = useAuthStore();
-  // Initialize auth hook inside Router context
-  useAuth();
+  const { user, isLoading, isInitialized } = useAuth();
 
-  if (!isInitialized) {
+  // Wait for auth to initialize
+  if (!isInitialized || isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="flex min-h-screen items-center justify-center">
         <LoadingSpinner size="lg" />
       </div>
     );
@@ -35,21 +33,26 @@ function AppRoutes() {
   return (
     <Routes>
       {/* Public routes */}
-      <Route path="/" element={
-        isAuthenticated ? <Navigate to="/dashboard" replace /> : <Landing />
-      } />
-      <Route path="/login" element={
-        isAuthenticated ? <Navigate to="/dashboard" replace /> : <Login />
-      } />
+      <Route
+        path="/"
+        element={user ? <Navigate to="/dashboard" replace /> : <Landing />}
+      />
+      <Route
+        path="/login"
+        element={user ? <Navigate to="/dashboard" replace /> : <Login />}
+      />
       <Route path="/reset-password" element={<PasswordReset />} />
       <Route path="/feedback/:trackingCode" element={<FeedbackPage />} />
-      
+
       {/* Protected routes */}
-      <Route path="/dashboard" element={
-        <ProtectedRoute>
-          <DashboardLayout />
-        </ProtectedRoute>
-      }>
+      <Route
+        path="/dashboard"
+        element={
+          <ProtectedRoute>
+            <DashboardLayout />
+          </ProtectedRoute>
+        }
+      >
         <Route index element={<Dashboard />} />
         <Route path="users" element={<UserList />} />
         <Route path="locations" element={<LocationList />} />
@@ -61,18 +64,18 @@ function AppRoutes() {
       </Route>
 
       {/* Catch all route */}
-      <Route path="*" element={<Navigate to={isAuthenticated ? "/dashboard" : "/"} replace />} />
+      <Route path="*" element={<Navigate to={user ? '/dashboard' : '/'} replace />} />
     </Routes>
   );
 }
 
 function App() {
   return (
-    <GlobalErrorBoundary>
-      <Router future={{ v7_relativeSplatPath: true }}>
+    <Router future={{ v7_relativeSplatPath: true }}>
+      <GlobalErrorBoundary>
         <AppRoutes />
-      </Router>
-    </GlobalErrorBoundary>
+      </GlobalErrorBoundary>
+    </Router>
   );
 }
 

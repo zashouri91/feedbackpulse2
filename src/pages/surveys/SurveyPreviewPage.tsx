@@ -9,20 +9,20 @@ export default function SurveyPreviewPage() {
   const { id } = useParams<{ id: string }>();
   const { surveys, isLoading } = useSurveys();
   const [ratingStyle, setRatingStyle] = useState<'stars' | 'smileys' | 'numbers'>('smileys');
-  
+
   const survey = surveys.find(s => s.id === id);
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-t-2 border-blue-500"></div>
       </div>
     );
   }
 
   if (!survey) {
     return (
-      <div className="text-center py-12">
+      <div className="py-12 text-center">
         <h2 className="text-2xl font-semibold text-gray-900">Survey not found</h2>
         <p className="mt-2 text-gray-600">The survey you're looking for doesn't exist.</p>
       </div>
@@ -30,7 +30,7 @@ export default function SurveyPreviewPage() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="mx-auto max-w-4xl">
       <div className="mb-8">
         <h1 className="text-2xl font-semibold text-gray-900">Survey Preview</h1>
         <p className="mt-2 text-sm text-gray-700">
@@ -49,7 +49,7 @@ export default function SurveyPreviewPage() {
         </TabsContent>
 
         <TabsContent value="signature" className="mt-6">
-          <SignatureGenerator 
+          <SignatureGenerator
             surveyId={survey.id}
             ratingStyle={ratingStyle}
             onRatingStyleChange={setRatingStyle}

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import { useUIStore } from '../../store/uiStore';
 
 interface ErrorLoggerProps {
@@ -23,7 +23,6 @@ export function ErrorLogger({ error, componentStack }: ErrorLoggerProps) {
 
     // Here you could add integration with error reporting services
     // like Sentry, LogRocket, etc.
-    
   }, [error, componentStack, showToast]);
 
   return null;

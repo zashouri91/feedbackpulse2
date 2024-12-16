@@ -38,10 +38,10 @@ export type Permission =
   // Analytics
   | 'analytics.view'
   | 'analytics.export'
-  | 'analytics.view.detailed'    // For advanced metrics
-  | 'analytics.view.financial'   // For cost-related metrics
-  | 'analytics.customize'        // For customizing dashboards
-  | 'analytics.share';          // For sharing reports
+  | 'analytics.view.detailed' // For advanced metrics
+  | 'analytics.view.financial' // For cost-related metrics
+  | 'analytics.customize' // For customizing dashboards
+  | 'analytics.share'; // For sharing reports
 
 export const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
   admin: [
@@ -51,17 +51,17 @@ export const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
     'analytics.view.detailed',
     'analytics.view.financial',
     'analytics.customize',
-    'analytics.share'
+    'analytics.share',
   ],
   manager: [
     // ... existing permissions ...
     'analytics.view',
     'analytics.export',
     'analytics.view.detailed',
-    'analytics.share'
+    'analytics.share',
   ],
   user: [
     // ... existing permissions ...
-    'analytics.view'  // Basic analytics only
-  ]
+    'analytics.view', // Basic analytics only
+  ],
 };

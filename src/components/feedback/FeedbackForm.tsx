@@ -16,7 +16,7 @@ const feedbackSchema = z.object({
   comment: z.string().optional(),
   answers: z.record(z.string()).optional(),
   contact: z.boolean().optional(),
-  email: z.string().email().optional()
+  email: z.string().email().optional(),
 });
 
 type FeedbackData = z.infer<typeof feedbackSchema>;
@@ -32,11 +32,16 @@ export function FeedbackForm({ survey, trackingCode, onSubmit }: FeedbackFormPro
   const [rating, setRating] = useState<number>();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const { register, handleSubmit, watch, formState: { errors } } = useForm<FeedbackData>({
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors },
+  } = useForm<FeedbackData>({
     resolver: zodResolver(feedbackSchema),
     defaultValues: {
-      contact: false
-    }
+      contact: false,
+    },
   });
 
   const wantsContact = watch('contact');
@@ -52,7 +57,7 @@ export function FeedbackForm({ survey, trackingCode, onSubmit }: FeedbackFormPro
       await onSubmit({
         ...data,
         rating: rating!,
-        trackingCode
+        trackingCode,
       });
       setStep('success');
     } finally {
@@ -61,35 +66,29 @@ export function FeedbackForm({ survey, trackingCode, onSubmit }: FeedbackFormPro
   };
 
   if (step === 'success') {
-    return (
-      <FeedbackSuccess
-        message={survey.successMessage || "Thank you for your feedback!"}
-      />
-    );
+    return <FeedbackSuccess message={survey.successMessage || 'Thank you for your feedback!'} />;
   }
 
   if (step === 'rating') {
     return (
-      <div className="max-w-xl mx-auto py-12">
-        <RatingStep
-          style={survey.ratingStyle}
-          value={rating}
-          onChange={handleRating}
-        />
+      <div className="mx-auto max-w-xl py-12">
+        <RatingStep style={survey.ratingStyle} value={rating} onChange={handleRating} />
       </div>
     );
   }
 
   return (
-    <form onSubmit={handleSubmit(handleSubmitForm)} className="max-w-xl mx-auto py-12 space-y-6">
+    <form onSubmit={handleSubmit(handleSubmitForm)} className="mx-auto max-w-xl space-y-6 py-12">
       <Select
         label="What was the main reason for your rating?"
         {...register('reason')}
         error={errors.reason?.message}
       >
         <option value="">Select a reason</option>
-        {survey.reasons.map((reason) => (
-          <option key={reason} value={reason}>{reason}</option>
+        {survey.reasons.map(reason => (
+          <option key={reason} value={reason}>
+            {reason}
+          </option>
         ))}
       </Select>
 
@@ -102,7 +101,7 @@ export function FeedbackForm({ survey, trackingCode, onSubmit }: FeedbackFormPro
         error={errors.comment?.message}
       />
 
-      {survey.questions.map((question) => (
+      {survey.questions.map(question => (
         <div key={question.id}>
           {question.type === 'text' ? (
             <Input
@@ -119,8 +118,10 @@ export function FeedbackForm({ survey, trackingCode, onSubmit }: FeedbackFormPro
               error={errors.answers?.[question.id]?.message}
             >
               <option value="">Select an option</option>
-              {question.options?.map((option) => (
-                <option key={option} value={option}>{option}</option>
+              {question.options?.map(option => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
               ))}
             </Select>
           ) : null}
@@ -134,9 +135,7 @@ export function FeedbackForm({ survey, trackingCode, onSubmit }: FeedbackFormPro
             {...register('contact')}
             className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
           />
-          <span className="text-sm text-gray-700">
-            I'd like to be contacted about my feedback
-          </span>
+          <span className="text-sm text-gray-700">I'd like to be contacted about my feedback</span>
         </label>
 
         {wantsContact && (
@@ -150,11 +149,7 @@ export function FeedbackForm({ survey, trackingCode, onSubmit }: FeedbackFormPro
       </div>
 
       <div className="flex justify-end gap-4">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={() => setStep('rating')}
-        >
+        <Button type="button" variant="outline" onClick={() => setStep('rating')}>
           Back
         </Button>
         <Button type="submit" disabled={isSubmitting}>

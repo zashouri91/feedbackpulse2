@@ -16,13 +16,13 @@ interface SignaturePreviewProps {
 
 export function SignaturePreview({ data, scale = 1 }: SignaturePreviewProps) {
   return (
-    <div 
-      className="border rounded-lg p-4 bg-white"
+    <div
+      className="rounded-lg border bg-white p-4"
       style={{ transform: `scale(${scale})`, transformOrigin: 'top left' }}
     >
       <div
         dangerouslySetInnerHTML={{
-          __html: generateSignatureHtml(data)
+          __html: generateSignatureHtml(data),
         }}
       />
     </div>

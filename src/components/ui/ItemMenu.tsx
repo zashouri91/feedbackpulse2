@@ -30,10 +30,7 @@ export function ItemMenu({ onEdit, onDelete }: ItemMenuProps) {
           </DropdownMenuItem>
         )}
         {onDelete && (
-          <DropdownMenuItem
-            onClick={onDelete}
-            className="text-red-600 focus:text-red-600"
-          >
+          <DropdownMenuItem onClick={onDelete} className="text-red-600 focus:text-red-600">
             <Trash2 className="mr-2 h-4 w-4" />
             Delete
           </DropdownMenuItem>

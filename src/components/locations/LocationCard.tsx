@@ -27,7 +27,7 @@ export function LocationCard({ location, onDelete, onUpdate }: LocationCardProps
 
   return (
     <div className="relative flex flex-col space-y-2 rounded-lg border border-gray-300 bg-white p-6 shadow-sm hover:border-gray-400">
-      <div className="flex justify-between items-start">
+      <div className="flex items-start justify-between">
         <div>
           <h3 className="text-lg font-medium text-gray-900">{location.name}</h3>
           <p className="text-sm text-gray-500">
@@ -37,7 +37,7 @@ export function LocationCard({ location, onDelete, onUpdate }: LocationCardProps
             {location.state}, {location.country}
           </p>
         </div>
-        
+
         <ActionsDropdown
           onEdit={() => setIsEditOpen(true)}
           onDelete={() => setIsDeleteOpen(true)}
@@ -48,7 +48,7 @@ export function LocationCard({ location, onDelete, onUpdate }: LocationCardProps
         isOpen={isEditOpen}
         onClose={() => setIsEditOpen(false)}
         location={location}
-        onSubmit={(data) => onUpdate(location.id, data)}
+        onSubmit={data => onUpdate(location.id, data)}
       />
 
       <ConfirmDialog

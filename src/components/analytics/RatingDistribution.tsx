@@ -19,33 +19,31 @@ export function RatingDistribution({ distribution }: RatingDistributionProps) {
           '#eab308', // 3 stars
           '#84cc16', // 4 stars
           '#22c55e', // 5 stars
-        ]
-      }
-    ]
+        ],
+      },
+    ],
   };
 
   const options = {
     responsive: true,
     plugins: {
       legend: {
-        display: false
-      }
+        display: false,
+      },
     },
     scales: {
       y: {
         beginAtZero: true,
         ticks: {
-          precision: 0
-        }
-      }
-    }
+          precision: 0,
+        },
+      },
+    },
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm p-6">
-      <h3 className="text-lg font-medium text-gray-900 mb-4">
-        Rating Distribution
-      </h3>
+    <div className="rounded-lg bg-white p-6 shadow-sm">
+      <h3 className="mb-4 text-lg font-medium text-gray-900">Rating Distribution</h3>
       <div className="h-64">
         <Bar data={chartData} options={options} />
       </div>

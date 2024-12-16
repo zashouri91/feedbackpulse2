@@ -19,17 +19,8 @@ export function EditLocationDialog({
   isLoading,
 }: EditLocationDialogProps) {
   return (
-    <ConfirmDialog
-      title="Edit Location"
-      isOpen={isOpen}
-      onClose={onClose}
-      showConfirm={false}
-    >
-      <LocationForm
-        defaultValues={location}
-        onSubmit={onSubmit}
-        isLoading={isLoading}
-      />
+    <ConfirmDialog title="Edit Location" isOpen={isOpen} onClose={onClose} showConfirm={false}>
+      <LocationForm defaultValues={location} onSubmit={onSubmit} isLoading={isLoading} />
     </ConfirmDialog>
   );
 }

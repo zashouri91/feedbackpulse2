@@ -12,9 +12,7 @@ export class AppError extends Error {
 }
 
 export function handleError(error: Error | AppError, context?: string) {
-  const message = error instanceof AppError 
-    ? error.message 
-    : 'An unexpected error occurred';
+  const message = error instanceof AppError ? error.message : 'An unexpected error occurred';
 
   // Log error in development
   if (process.env.NODE_ENV === 'development') {
@@ -33,8 +31,5 @@ export function handleApiError(error: any) {
     throw new AppError('Your session has expired. Please sign in again.', 'AUTH_EXPIRED');
   }
 
-  throw new AppError(
-    error?.message || 'An unexpected error occurred',
-    error?.code
-  );
+  throw new AppError(error?.message || 'An unexpected error occurred', error?.code);
 }

@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Download, FileSpreadsheet, FileText } from 'lucide-react';
+import React from 'react';
+import { FileSpreadsheet, FileText } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { useAnalytics } from '../../hooks/useAnalytics';
 
@@ -13,15 +13,15 @@ interface AnalyticsExportProps {
 }
 
 export function AnalyticsExport({ filters }: AnalyticsExportProps) {
-  const [isExporting, setIsExporting] = useState(false);
+  const [isExporting, setIsExporting] = React.useState(false);
   const { exportData } = useAnalytics(filters);
 
   const handleExport = async (format: 'csv' | 'pdf') => {
     setIsExporting(true);
     try {
       const data = await exportData(format);
-      const blob = new Blob([data], { 
-        type: format === 'csv' ? 'text/csv' : 'application/pdf' 
+      const blob = new Blob([data], {
+        type: format === 'csv' ? 'text/csv' : 'application/pdf',
       });
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -38,20 +38,12 @@ export function AnalyticsExport({ filters }: AnalyticsExportProps) {
 
   return (
     <div className="flex gap-2">
-      <Button
-        variant="outline"
-        onClick={() => handleExport('csv')}
-        disabled={isExporting}
-      >
-        <FileSpreadsheet className="h-4 w-4 mr-2" />
+      <Button variant="outline" onClick={() => handleExport('csv')} disabled={isExporting}>
+        <FileSpreadsheet className="mr-2 h-4 w-4" />
         Export CSV
       </Button>
-      <Button
-        variant="outline"
-        onClick={() => handleExport('pdf')}
-        disabled={isExporting}
-      >
-        <FileText className="h-4 w-4 mr-2" />
+      <Button variant="outline" onClick={() => handleExport('pdf')} disabled={isExporting}>
+        <FileText className="mr-2 h-4 w-4" />
         Export PDF
       </Button>
     </div>

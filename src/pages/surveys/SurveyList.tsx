@@ -9,7 +9,15 @@ import { ConfirmDialog } from '../../components/ui/ConfirmDialog';
 
 export default function SurveyList() {
   const { surveys, isLoading, deleteSurveys } = useSurveys();
-  const { selectedIds, toggleSelection, toggleAll, clearSelection, isSelected, selectedCount, isAllSelected } = useBatchSelection(surveys);
+  const {
+    selectedIds,
+    toggleSelection,
+    toggleAll,
+    clearSelection,
+    isSelected,
+    selectedCount,
+    isAllSelected,
+  } = useBatchSelection(surveys);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -35,7 +43,7 @@ export default function SurveyList() {
         </div>
         <div className="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
           <Button>
-            <Plus className="h-4 w-4 mr-2" />
+            <Plus className="mr-2 h-4 w-4" />
             Create Survey
           </Button>
         </div>
@@ -77,7 +85,7 @@ export default function SurveyList() {
                     <tr>
                       <td colSpan={6} className="py-10">
                         <div className="flex justify-center">
-                          <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
+                          <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-t-2 border-blue-500"></div>
                         </div>
                       </td>
                     </tr>
@@ -88,7 +96,7 @@ export default function SurveyList() {
                       </td>
                     </tr>
                   ) : (
-                    surveys.map((survey) => (
+                    surveys.map(survey => (
                       <tr key={survey.id}>
                         <td className="relative px-7 sm:w-12 sm:px-6">
                           <Checkbox
@@ -101,15 +109,18 @@ export default function SurveyList() {
                           {survey.title}
                         </td>
                         <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                          <span className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 ${
-                            survey.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-                          }`}>
+                          <span
+                            className={`inline-flex rounded-full px-2 text-xs font-semibold leading-5 ${
+                              survey.isActive
+                                ? 'bg-green-100 text-green-800'
+                                : 'bg-gray-100 text-gray-800'
+                            }`}
+                          >
                             {survey.isActive ? 'Active' : 'Draft'}
                           </span>
                         </td>
                         <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                          {/* Add response count here */}
-                          0
+                          {/* Add response count here */}0
                         </td>
                         <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                           {new Date(survey.createdAt).toLocaleDateString()}

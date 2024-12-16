@@ -6,6 +6,10 @@ values (
   'feedbackpulse.com'
 );
 
+-- This is a template for creating an admin user
+-- Uncomment and replace the values with actual data when needed
+
+/*
 -- Create the admin profile
 -- Note: Replace 'ADMIN_USER_ID' with the actual UUID from Supabase Auth after creating the user
 insert into profiles (
@@ -30,3 +34,4 @@ insert into profiles (
     'analytics.share'
   ]
 );
+*/

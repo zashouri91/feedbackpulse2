@@ -23,16 +23,10 @@ export default function NewSurvey() {
     <div>
       <div className="mb-8">
         <h1 className="text-2xl font-semibold text-gray-900">Create New Survey</h1>
-        <p className="mt-2 text-sm text-gray-700">
-          Design your survey using the builder below.
-        </p>
+        <p className="mt-2 text-sm text-gray-700">Design your survey using the builder below.</p>
       </div>
 
-      <SurveyBuilder
-        initialData={template}
-        onSubmit={handleSubmit}
-        isLoading={isLoading}
-      />
+      <SurveyBuilder initialData={template} onSubmit={handleSubmit} isLoading={isLoading} />
     </div>
   );
 }

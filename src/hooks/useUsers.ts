@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuthStore } from '../store/authStore';
 import type { Profile } from '../types/auth';
@@ -9,9 +9,9 @@ export function useUsers() {
   const [isLoading, setIsLoading] = useState(true);
   const { user } = useAuthStore();
 
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
     if (!user?.organizationId) return;
-    
+
     try {
       const { data, error } = await supabase
         .from('profiles')
@@ -25,10 +25,6 @@ export function useUsers() {
     } finally {
       setIsLoading(false);
     }
-  };
-
-  useEffect(() => {
-    fetchUsers();
   }, [user?.organizationId]);
 
   const addUser = async (userData: Partial<Profile>) => {
@@ -37,7 +33,7 @@ export function useUsers() {
     }
 
     setIsLoading(true);
-    
+
     // Create a temporary ID for optimistic update
     const tempId = generateId();
     const tempUser = {
@@ -45,19 +41,21 @@ export function useUsers() {
       ...userData,
       organization_id: user.organizationId,
       created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
+      updated_at: new Date().toISOString(),
     } as Profile;
-    
+
     // Optimistically add the user
     setUsers(current => [...current, tempUser]);
 
     try {
       const { data, error } = await supabase
         .from('profiles')
-        .insert([{
-          ...userData,
-          organization_id: user.organizationId
-        }])
+        .insert([
+          {
+            ...userData,
+            organization_id: user.organizationId,
+          },
+        ])
         .select()
         .single();
 
@@ -68,10 +66,8 @@ export function useUsers() {
       }
 
       // Replace temp user with real one
-      setUsers(current => 
-        current.map(u => u.id === tempId ? data : u)
-      );
-      
+      setUsers(current => current.map(u => (u.id === tempId ? data : u)));
+
       return data;
     } catch (error) {
       console.error('Error adding user:', error);
@@ -87,14 +83,12 @@ export function useUsers() {
     }
 
     setIsLoading(true);
-    
+
     // Store the original user for rollback
     const originalUser = users.find(u => u.id === id);
-    
+
     // Optimistically update the user
-    setUsers(current =>
-      current.map(u => u.id === id ? { ...u, ...userData } : u)
-    );
+    setUsers(current => current.map(u => (u.id === id ? { ...u, ...userData } : u)));
 
     try {
       const { data, error } = await supabase
@@ -108,9 +102,7 @@ export function useUsers() {
       if (error) {
         // Revert optimistic update on error
         if (originalUser) {
-          setUsers(current =>
-            current.map(u => u.id === id ? originalUser : u)
-          );
+          setUsers(current => current.map(u => (u.id === id ? originalUser : u)));
         }
         throw error;
       }
@@ -130,10 +122,10 @@ export function useUsers() {
     }
 
     setIsLoading(true);
-    
+
     // Store the user for rollback
     const deletedUser = users.find(u => u.id === id);
-    
+
     // Optimistically remove the user
     setUsers(current => current.filter(u => u.id !== id));
 
@@ -158,6 +150,10 @@ export function useUsers() {
       setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchUsers();
+  }, [fetchUsers]);
 
   return {
     users,

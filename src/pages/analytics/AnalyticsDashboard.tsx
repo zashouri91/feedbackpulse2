@@ -15,7 +15,7 @@ export default function AnalyticsDashboard() {
     startDate: undefined,
     endDate: undefined,
     groupId: undefined,
-    locationId: undefined
+    locationId: undefined,
   });
 
   const { stats, isLoading } = useAnalytics(filters);
@@ -29,7 +29,7 @@ export default function AnalyticsDashboard() {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex min-h-screen items-center justify-center">
         <LoadingSpinner size="lg" />
       </div>
     );
@@ -37,7 +37,7 @@ export default function AnalyticsDashboard() {
 
   if (!stats) {
     return (
-      <div className="text-center py-12">
+      <div className="py-12 text-center">
         <p className="text-gray-500">No analytics data available</p>
       </div>
     );
@@ -45,41 +45,35 @@ export default function AnalyticsDashboard() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
+      <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold text-gray-900">Analytics</h1>
         <div className="flex items-center gap-4">
           {canExport && (
             <Button variant="outline">
-              <Download className="h-4 w-4 mr-2" />
+              <Download className="mr-2 h-4 w-4" />
               Export Data
             </Button>
           )}
-          
+
           {canCustomize && (
             <Button variant="outline">
-              <Settings className="h-4 w-4 mr-2" />
+              <Settings className="mr-2 h-4 w-4" />
               Customize Dashboard
             </Button>
           )}
-          
+
           {canShare && (
             <Button variant="outline">
-              <Share className="h-4 w-4 mr-2" />
+              <Share className="mr-2 h-4 w-4" />
               Share Report
             </Button>
           )}
         </div>
       </div>
 
-      <AnalyticsFilters
-        filters={filters}
-        onChange={setFilters}
-      />
+      <AnalyticsFilters filters={filters} onChange={setFilters} />
 
-      <DashboardStats 
-        stats={stats}
-        showFinancial={canViewFinancial}
-      />
+      <DashboardStats stats={stats} showFinancial={canViewFinancial} />
 
       {canViewDetailed && (
         <>

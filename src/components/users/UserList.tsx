@@ -27,29 +27,20 @@ interface UserFormProps {
 }
 
 function UserForm({ defaultValues, onSubmit, isLoading }: UserFormProps) {
-  const { register, handleSubmit, formState: { errors } } = useForm<UserFormData>({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<UserFormData>({
     resolver: zodResolver(userSchema),
     defaultValues,
   });
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-      <Input
-        label="Name"
-        {...register('name')}
-        error={errors.name?.message}
-      />
-      <Input
-        label="Email"
-        type="email"
-        {...register('email')}
-        error={errors.email?.message}
-      />
-      <Select
-        label="Role"
-        {...register('role')}
-        error={errors.role?.message}
-      >
+      <Input label="Name" {...register('name')} error={errors.name?.message} />
+      <Input label="Email" type="email" {...register('email')} error={errors.email?.message} />
+      <Select label="Role" {...register('role')} error={errors.role?.message}>
         <option value="user">User</option>
         <option value="manager">Manager</option>
         <option value="admin">Admin</option>
@@ -78,11 +69,7 @@ function UserDialog({ user, isOpen, onClose, onSubmit, isLoading }: UserDialogPr
         <DialogHeader>
           <DialogTitle>{user ? 'Edit User' : 'Add User'}</DialogTitle>
         </DialogHeader>
-        <UserForm
-          defaultValues={user}
-          onSubmit={onSubmit}
-          isLoading={isLoading}
-        />
+        <UserForm defaultValues={user} onSubmit={onSubmit} isLoading={isLoading} />
       </DialogContent>
     </Dialog>
   );
@@ -123,27 +110,21 @@ export function UserList() {
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-between items-center">
+      <div className="flex items-center justify-between">
         <h2 className="text-lg font-semibold">Users</h2>
         <Button onClick={() => setIsAddDialogOpen(true)}>Add User</Button>
       </div>
 
       <div className="divide-y divide-gray-200 rounded-md border">
-        {users?.map((user) => (
-          <div
-            key={user.id}
-            className="flex items-center justify-between p-4 hover:bg-gray-50"
-          >
+        {users?.map(user => (
+          <div key={user.id} className="flex items-center justify-between p-4 hover:bg-gray-50">
             <div>
               <h3 className="font-medium">{user.name}</h3>
               <p className="text-sm text-gray-500">
                 {user.email} • {user.role}
               </p>
             </div>
-            <ItemMenu
-              onEdit={() => setEditUser(user)}
-              onDelete={() => handleDelete(user)}
-            />
+            <ItemMenu onEdit={() => setEditUser(user)} onDelete={() => handleDelete(user)} />
           </div>
         ))}
         {(!users || users.length === 0) && !isLoading && (

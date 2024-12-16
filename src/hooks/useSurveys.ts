@@ -32,9 +32,7 @@ export function useSurveys(id?: string) {
     setIsLoading(true);
     setError(null);
     try {
-      const { data, error: apiError } = await supabase
-        .from('surveys')
-        .select('*');
+      const { data, error: apiError } = await supabase.from('surveys').select('*');
 
       if (apiError) throw new Error(apiError.message);
       setSurveys(data || []);
@@ -58,9 +56,7 @@ export function useSurveys(id?: string) {
     setIsLoading(true);
     setError(null);
     try {
-      const { error: apiError } = await supabase
-        .from('surveys')
-        .insert([surveyData]);
+      const { error: apiError } = await supabase.from('surveys').insert([surveyData]);
 
       if (apiError) throw new Error(apiError.message);
       if (id) {
@@ -103,10 +99,7 @@ export function useSurveys(id?: string) {
     setIsLoading(true);
     setError(null);
     try {
-      const { error: apiError } = await supabase
-        .from('surveys')
-        .delete()
-        .eq('id', surveyId);
+      const { error: apiError } = await supabase.from('surveys').delete().eq('id', surveyId);
 
       if (apiError) throw new Error(apiError.message);
       if (id) {
@@ -126,10 +119,7 @@ export function useSurveys(id?: string) {
     setIsLoading(true);
     setError(null);
     try {
-      const { error: apiError } = await supabase
-        .from('surveys')
-        .delete()
-        .in('id', ids);
+      const { error: apiError } = await supabase.from('surveys').delete().in('id', ids);
 
       if (apiError) throw new Error(apiError.message);
       await fetchSurveys();
@@ -150,6 +140,6 @@ export function useSurveys(id?: string) {
     updateSurvey,
     deleteSurvey,
     deleteSurveys,
-    refresh: id ? () => fetchSurvey(id) : fetchSurveys
+    refresh: id ? () => fetchSurvey(id) : fetchSurveys,
   };
 }

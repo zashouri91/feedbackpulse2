@@ -23,7 +23,7 @@ class Logger {
       level,
       message,
       context,
-      metadata
+      metadata,
     };
   }
 
@@ -58,9 +58,8 @@ class Logger {
   }
 
   getLogs(level?: LogLevel, context?: string): LogEntry[] {
-    return this.logs.filter(log => 
-      (!level || log.level === level) &&
-      (!context || log.context === context)
+    return this.logs.filter(
+      log => (!level || log.level === level) && (!context || log.context === context)
     );
   }
 

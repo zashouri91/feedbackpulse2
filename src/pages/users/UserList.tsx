@@ -41,12 +41,12 @@ export default function UserList() {
         </div>
         <div className="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
           <Button onClick={() => setIsAddUserOpen(true)}>
-            <Plus className="h-4 w-4 mr-2" />
+            <Plus className="mr-2 h-4 w-4" />
             Add User
           </Button>
         </div>
       </div>
-      
+
       <div className="mt-8 flow-root">
         <div className="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
           <div className="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
@@ -82,7 +82,7 @@ export default function UserList() {
                       </td>
                     </tr>
                   ) : (
-                    users.map((user) => (
+                    users.map(user => (
                       <tr key={user.id}>
                         <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900">
                           {user.firstName} {user.lastName}
@@ -115,11 +115,8 @@ export default function UserList() {
         </div>
       </div>
 
-      <AddUserDialog
-        isOpen={isAddUserOpen}
-        onClose={() => setIsAddUserOpen(false)}
-      />
-      
+      <AddUserDialog isOpen={isAddUserOpen} onClose={() => setIsAddUserOpen(false)} />
+
       {editUser && (
         <EditUserDialog
           user={editUser}

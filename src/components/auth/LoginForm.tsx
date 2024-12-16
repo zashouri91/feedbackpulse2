@@ -10,7 +10,7 @@ import { useUIStore } from '../../store/uiStore';
 
 const loginSchema = z.object({
   email: z.string().email('Invalid email address'),
-  password: z.string().min(6, 'Password must be at least 6 characters')
+  password: z.string().min(6, 'Password must be at least 6 characters'),
 });
 
 type LoginFormData = z.infer<typeof loginSchema>;
@@ -19,8 +19,12 @@ export function LoginForm() {
   const { signIn } = useAuth();
   const navigate = useNavigate();
   const showToast = useUIStore(state => state.showToast);
-  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<LoginFormData>({
-    resolver: zodResolver(loginSchema)
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<LoginFormData>({
+    resolver: zodResolver(loginSchema),
   });
 
   const onSubmit = async (data: LoginFormData) => {
@@ -40,14 +44,9 @@ export function LoginForm() {
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
       <div>
-        <Input
-          label="Email"
-          type="email"
-          error={errors.email?.message}
-          {...register('email')}
-        />
+        <Input label="Email" type="email" error={errors.email?.message} {...register('email')} />
       </div>
-      
+
       <div>
         <Input
           label="Password"
@@ -57,11 +56,7 @@ export function LoginForm() {
         />
       </div>
 
-      <Button
-        type="submit"
-        disabled={isSubmitting}
-        className="w-full"
-      >
+      <Button type="submit" disabled={isSubmitting} className="w-full">
         {isSubmitting ? 'Signing in...' : 'Sign in'}
       </Button>
     </form>

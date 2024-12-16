@@ -1,5 +1,5 @@
 import React from 'react';
-import { Star, SmilePlus, Hash } from 'lucide-react';
+import { Star, SmilePlus } from 'lucide-react';
 import { cn } from '../../utils/cn';
 
 interface RatingStepProps {
@@ -9,12 +9,7 @@ interface RatingStepProps {
   disabled?: boolean;
 }
 
-export function RatingStep({ 
-  style = 'smileys',
-  value,
-  onChange,
-  disabled
-}: RatingStepProps) {
+export function RatingStep({ style = 'smileys', value, onChange, disabled }: RatingStepProps) {
   const ratings = [1, 2, 3, 4, 5];
 
   const renderRating = (rating: number) => {
@@ -25,14 +20,14 @@ export function RatingStep({
             key={rating}
             onClick={() => !disabled && onChange(rating)}
             className={cn(
-              "transition-colors",
-              value && rating <= value ? "text-yellow-400" : "text-gray-300",
-              disabled ? "cursor-not-allowed opacity-50" : "hover:text-yellow-400"
+              'transition-colors',
+              value && rating <= value ? 'text-yellow-400' : 'text-gray-300',
+              disabled ? 'cursor-not-allowed opacity-50' : 'hover:text-yellow-400'
             )}
             disabled={disabled}
             aria-label={`Rate ${rating} stars`}
           >
-            <Star className="w-10 h-10" />
+            <Star className="h-10 w-10" />
           </button>
         );
 
@@ -42,11 +37,11 @@ export function RatingStep({
             key={rating}
             onClick={() => !disabled && onChange(rating)}
             className={cn(
-              "w-12 h-12 rounded-full border-2 flex items-center justify-center text-lg font-medium transition-colors",
+              'flex h-12 w-12 items-center justify-center rounded-full border-2 text-lg font-medium transition-colors',
               value === rating
-                ? "border-blue-500 bg-blue-50 text-blue-600"
-                : "border-gray-300 text-gray-600",
-              disabled ? "cursor-not-allowed opacity-50" : "hover:border-blue-400 hover:bg-blue-50"
+                ? 'border-blue-500 bg-blue-50 text-blue-600'
+                : 'border-gray-300 text-gray-600',
+              disabled ? 'cursor-not-allowed opacity-50' : 'hover:border-blue-400 hover:bg-blue-50'
             )}
             disabled={disabled}
             aria-label={`Rate ${rating}`}
@@ -61,19 +56,19 @@ export function RatingStep({
             key={rating}
             onClick={() => !disabled && onChange(rating)}
             className={cn(
-              "w-12 h-12 rounded-full flex items-center justify-center transition-colors",
-              value === rating ? "bg-opacity-100" : "bg-opacity-10",
+              'flex h-12 w-12 items-center justify-center rounded-full transition-colors',
+              value === rating ? 'bg-opacity-100' : 'bg-opacity-10',
               rating <= 2
-                ? "bg-red-500 text-red-500"
+                ? 'bg-red-500 text-red-500'
                 : rating === 3
-                ? "bg-yellow-500 text-yellow-500"
-                : "bg-green-500 text-green-500",
-              disabled ? "cursor-not-allowed opacity-50" : "hover:bg-opacity-20"
+                  ? 'bg-yellow-500 text-yellow-500'
+                  : 'bg-green-500 text-green-500',
+              disabled ? 'cursor-not-allowed opacity-50' : 'hover:bg-opacity-20'
             )}
             disabled={disabled}
             aria-label={`Rate ${rating}`}
           >
-            <SmilePlus className="w-6 h-6" />
+            <SmilePlus className="h-6 w-6" />
           </button>
         );
     }
@@ -81,12 +76,8 @@ export function RatingStep({
 
   return (
     <div className="text-center">
-      <h2 className="text-2xl font-semibold text-gray-900 mb-8">
-        How was your experience?
-      </h2>
-      <div className="flex justify-center gap-4">
-        {ratings.map(renderRating)}
-      </div>
+      <h2 className="mb-8 text-2xl font-semibold text-gray-900">How was your experience?</h2>
+      <div className="flex justify-center gap-4">{ratings.map(renderRating)}</div>
     </div>
   );
 }

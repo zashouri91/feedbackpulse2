@@ -6,41 +6,59 @@ interface AuthState {
   user: User | null;
   error: string | null;
   loading: boolean;
+  isInitialized: boolean;
   setUser: (user: User | null) => void;
   setError: (error: string | null) => void;
   setLoading: (loading: boolean) => void;
+  setInitialized: (initialized: boolean) => void;
   clearUser: () => void;
+  retryAuth: () => Promise<void>;
+  isOffline: boolean;
 }
 
 export const useAuthStore = create<AuthState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       user: null,
       error: null,
       loading: true,
-      setUser: (user) => set({ user, error: null }),
-      setError: (error) => set({ error }),
-      setLoading: (loading) => set({ loading }),
+      isInitialized: false,
+      isOffline: false,
+      setUser: user => set({ user, error: null }),
+      setError: error => {
+        console.error('Auth error:', error);
+        set({ error, loading: false });
+      },
+      setLoading: loading => set({ loading }),
+      setInitialized: initialized => set({ isInitialized: initialized }),
       clearUser: () => set({ user: null, error: null }),
+      retryAuth: async () => {
+        const state = get();
+        if (state.error) {
+          set({ loading: true, error: null });
+          try {
+            // Attempt to restore session from localStorage
+            const savedUser = localStorage.getItem('auth-user');
+            if (savedUser) {
+              const user = JSON.parse(savedUser);
+              set({ user, loading: false, error: null });
+            } else {
+              set({ loading: false });
+            }
+          } catch (error) {
+            set({
+              error: 'Failed to restore session',
+              loading: false,
+            });
+          }
+        }
+      },
     }),
     {
-      name: 'auth-storage',
-      partialize: (state) => ({ user: state.user }), // Only persist the user data
-      storage: {
-        getItem: (name) => {
-          const str = localStorage.getItem(name);
-          console.log('Auth store: Getting from storage:', name, str ? 'exists' : 'not found');
-          return str;
-        },
-        setItem: (name, value) => {
-          console.log('Auth store: Setting in storage:', name);
-          localStorage.setItem(name, value);
-        },
-        removeItem: (name) => {
-          console.log('Auth store: Removing from storage:', name);
-          localStorage.removeItem(name);
-        },
-      },
+      name: 'auth-store',
+      partialize: state => ({
+        user: state.user,
+      }),
     }
   )
 );

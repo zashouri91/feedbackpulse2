@@ -9,15 +9,7 @@ interface SignatureData {
 }
 
 export function generateSignatureHtml(data: SignatureData): string {
-  const {
-    name,
-    title,
-    email,
-    phone,
-    logo,
-    primaryColor,
-    layout
-  } = data;
+  const { name, title, email, phone, logo, primaryColor, layout } = data;
 
   const styles = {
     container: `font-family: Arial, sans-serif; color: #333333; ${
@@ -30,16 +22,20 @@ export function generateSignatureHtml(data: SignatureData): string {
     divider: `width: ${layout === 'horizontal' ? '1px' : '100%'}; 
              height: ${layout === 'horizontal' ? '40px' : '1px'}; 
              background-color: #e5e7eb; 
-             margin: ${layout === 'horizontal' ? '0 15px' : '10px 0'};`
+             margin: ${layout === 'horizontal' ? '0 15px' : '10px 0'};`,
   };
 
   return `
     <div style="${styles.container}">
-      ${logo ? `
+      ${
+        logo
+          ? `
         <div style="${layout === 'horizontal' ? 'margin-right: 15px;' : ''}">
           <img src="${logo}" alt="Company Logo" style="${styles.logo}" />
         </div>
-      ` : ''}
+      `
+          : ''
+      }
       
       <div>
         <p style="${styles.name}">${name}</p>
@@ -49,12 +45,16 @@ export function generateSignatureHtml(data: SignatureData): string {
           <a href="mailto:${email}" style="color: ${primaryColor}; text-decoration: none;">
             ${email}
           </a>
-          ${phone ? `
+          ${
+            phone
+              ? `
             <br />
             <a href="tel:${phone}" style="color: ${primaryColor}; text-decoration: none;">
               ${phone}
             </a>
-          ` : ''}
+          `
+              : ''
+          }
         </p>
       </div>
     </div>

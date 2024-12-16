@@ -14,8 +14,8 @@ const profileSchema = z.object({
   title: z.string().optional(),
   notificationPreferences: z.object({
     email: z.boolean(),
-    inApp: z.boolean()
-  })
+    inApp: z.boolean(),
+  }),
 });
 
 type ProfileFormData = z.infer<typeof profileSchema>;
@@ -23,17 +23,21 @@ type ProfileFormData = z.infer<typeof profileSchema>;
 export function UserProfile() {
   const { user } = useAuthStore();
   const { updateProfile, isLoading } = useProfile();
-  
-  const { register, handleSubmit, formState: { errors } } = useForm<ProfileFormData>({
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
       fullName: user?.name || '',
       email: user?.email || '',
       notificationPreferences: {
         email: true,
-        inApp: true
-      }
-    }
+        inApp: true,
+      },
+    },
   });
 
   const onSubmit = async (data: ProfileFormData) => {
@@ -41,37 +45,29 @@ export function UserProfile() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto">
+    <div className="mx-auto max-w-2xl">
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-        <div className="bg-white shadow rounded-lg p-6">
-          <h2 className="text-lg font-medium text-gray-900 mb-6">Profile Settings</h2>
-          
+        <div className="rounded-lg bg-white p-6 shadow">
+          <h2 className="mb-6 text-lg font-medium text-gray-900">Profile Settings</h2>
+
           <div className="space-y-4">
-            <Input
-              label="Full Name"
-              {...register('fullName')}
-              error={errors.fullName?.message}
-            />
-            
+            <Input label="Full Name" {...register('fullName')} error={errors.fullName?.message} />
+
             <Input
               label="Email Address"
               type="email"
               {...register('email')}
               error={errors.email?.message}
             />
-            
+
             <Input
               label="Phone Number"
               type="tel"
               {...register('phone')}
               error={errors.phone?.message}
             />
-            
-            <Input
-              label="Job Title"
-              {...register('title')}
-              error={errors.title?.message}
-            />
+
+            <Input label="Job Title" {...register('title')} error={errors.title?.message} />
 
             <div className="space-y-2">
               <h3 className="text-sm font-medium text-gray-700">Notification Preferences</h3>
@@ -83,7 +79,7 @@ export function UserProfile() {
                 />
                 <span className="text-sm text-gray-700">Email notifications</span>
               </label>
-              
+
               <label className="flex items-center space-x-2">
                 <input
                   type="checkbox"

@@ -10,7 +10,7 @@ export const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
     'analytics.share',
     'users.manage',
     'surveys.manage',
-    'organization.manage'
+    'organization.manage',
   ],
   manager: [
     'analytics.view',
@@ -19,13 +19,9 @@ export const ROLE_PERMISSIONS: Record<Role, Permission[]> = {
     'analytics.share',
     'surveys.create',
     'surveys.edit',
-    'users.view'
+    'users.view',
   ],
-  user: [
-    'analytics.view',
-    'surveys.respond',
-    'profile.edit'
-  ]
+  user: ['analytics.view', 'surveys.respond', 'profile.edit'],
 };
 
 export function hasPermission(userRole: Role, permission: Permission): boolean {

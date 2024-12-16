@@ -31,19 +31,13 @@ export function Tabs({ defaultValue, children }: TabsProps) {
 
   return (
     <TabsContext.Provider value={{ value, onChange: setValue }}>
-      <div className="space-y-4">
-        {children}
-      </div>
+      <div className="space-y-4">{children}</div>
     </TabsContext.Provider>
   );
 }
 
 export function TabsList({ children }: TabsListProps) {
-  return (
-    <div className="flex space-x-1 rounded-lg bg-gray-100 p-1">
-      {children}
-    </div>
-  );
+  return <div className="flex space-x-1 rounded-lg bg-gray-100 p-1">{children}</div>;
 }
 
 export function TabsTrigger({ value, children }: TabsTriggerProps) {
@@ -55,10 +49,8 @@ export function TabsTrigger({ value, children }: TabsTriggerProps) {
   return (
     <button
       className={cn(
-        "px-3 py-1.5 text-sm font-medium rounded-md transition-all",
-        isSelected
-          ? "bg-white text-gray-900 shadow"
-          : "text-gray-600 hover:text-gray-900"
+        'rounded-md px-3 py-1.5 text-sm font-medium transition-all',
+        isSelected ? 'bg-white text-gray-900 shadow' : 'text-gray-600 hover:text-gray-900'
       )}
       onClick={() => context.onChange(value)}
     >
@@ -73,9 +65,5 @@ export function TabsContent({ value, children, className }: TabsContentProps) {
 
   if (context.value !== value) return null;
 
-  return (
-    <div className={className}>
-      {children}
-    </div>
-  );
+  return <div className={className}>{children}</div>;
 }

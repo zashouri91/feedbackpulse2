@@ -10,9 +10,7 @@ export function useFeedback() {
   const submitFeedback = async (data: Partial<FeedbackResponse>) => {
     setIsSubmitting(true);
     try {
-      const { error } = await supabase
-        .from('feedback_responses')
-        .insert([data]);
+      const { error } = await supabase.from('feedback_responses').insert([data]);
 
       if (error) throw error;
       showToast('success', 'Thank you for your feedback!');
@@ -27,6 +25,6 @@ export function useFeedback() {
 
   return {
     submitFeedback,
-    isSubmitting
+    isSubmitting,
   };
 }

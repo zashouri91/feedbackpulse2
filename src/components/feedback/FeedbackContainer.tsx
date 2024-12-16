@@ -11,29 +11,33 @@ interface FeedbackContainerProps {
   onSubmit: (data: any) => Promise<void>;
 }
 
-export function FeedbackContainer({
-  trackingCode,
-  survey,
-  onSubmit
-}: FeedbackContainerProps) {
+interface FeedbackData {
+  rating: number;
+  [key: string]: unknown;
+}
+
+export function FeedbackContainer({ trackingCode, survey, onSubmit }: FeedbackContainerProps) {
   const [step, setStep] = useState<'rating' | 'followUp' | 'success'>('rating');
   const [rating, setRating] = useState<number>();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   let tracking;
   try {
     tracking = parseTrackingCode(trackingCode);
-    if (!tracking || !tracking.surveyId || !tracking.userId || !tracking.groupId || !tracking.locationId) {
+    if (
+      !tracking ||
+      !tracking.surveyId ||
+      !tracking.userId ||
+      !tracking.groupId ||
+      !tracking.locationId
+    ) {
       throw new Error('Invalid tracking code format');
     }
   } catch (err) {
     return (
       <div className="flex flex-col items-center justify-center py-12">
-        <div className="text-red-600 font-medium mb-2">
-          Invalid feedback link
-        </div>
-        <div className="text-gray-600 text-sm">
+        <div className="mb-2 font-medium text-red-600">Invalid feedback link</div>
+        <div className="text-sm text-gray-600">
           Please check the URL and try again. If the problem persists, contact support.
         </div>
       </div>
@@ -45,7 +49,7 @@ export function FeedbackContainer({
     setStep('followUp');
   };
 
-  const handleFollowUp = async (data: any) => {
+  const handleFollowUp = async (data: FeedbackData) => {
     setIsSubmitting(true);
     try {
       await onSubmit({
@@ -56,7 +60,7 @@ export function FeedbackContainer({
         userId: tracking.userId,
         groupId: tracking.groupId,
         locationId: tracking.locationId,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
       setStep('success');
     } finally {
@@ -65,13 +69,9 @@ export function FeedbackContainer({
   };
 
   return (
-    <div className="max-w-2xl mx-auto">
+    <div className="mx-auto max-w-2xl">
       {step === 'rating' && (
-        <RatingStep
-          style={survey.ratingStyle}
-          value={rating}
-          onChange={handleRating}
-        />
+        <RatingStep style={survey.ratingStyle} value={rating} onChange={handleRating} />
       )}
 
       {step === 'followUp' && rating && (
@@ -84,7 +84,7 @@ export function FeedbackContainer({
             'Delivery Time',
             'Price',
             'User Experience',
-            'Other'
+            'Other',
           ]}
           onSubmit={handleFollowUp}
           isLoading={isSubmitting}
@@ -93,7 +93,10 @@ export function FeedbackContainer({
 
       {step === 'success' && (
         <FeedbackSuccess
-          message={survey.successMessage || "We appreciate your feedback and will use it to improve our services."}
+          message={
+            survey.successMessage ||
+            'We appreciate your feedback and will use it to improve our services.'
+          }
         />
       )}
     </div>

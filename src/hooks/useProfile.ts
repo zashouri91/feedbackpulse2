@@ -22,8 +22,8 @@ export function useProfile() {
           title: data.title,
           settings: {
             ...user.settings,
-            notificationPreferences: data.notificationPreferences
-          }
+            notificationPreferences: data.notificationPreferences,
+          },
         })
         .eq('id', user.id);
 
@@ -35,8 +35,8 @@ export function useProfile() {
         email: data.email,
         settings: {
           ...user.settings,
-          notificationPreferences: data.notificationPreferences
-        }
+          notificationPreferences: data.notificationPreferences,
+        },
       });
 
       showToast('success', 'Profile updated successfully');
@@ -51,6 +51,6 @@ export function useProfile() {
 
   return {
     updateProfile,
-    isLoading
+    isLoading,
   };
 }

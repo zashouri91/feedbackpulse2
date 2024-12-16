@@ -13,22 +13,26 @@ const organizationSchema = z.object({
     branding: z.object({
       primaryColor: z.string(),
       secondaryColor: z.string(),
-      logo: z.string().optional()
+      logo: z.string().optional(),
     }),
     emailSettings: z.object({
       defaultSignatureTemplate: z.string(),
-      allowCustomization: z.boolean()
-    })
-  })
+      allowCustomization: z.boolean(),
+    }),
+  }),
 });
 
 type OrganizationFormData = z.infer<typeof organizationSchema>;
 
 export function OrganizationSettings() {
   const { organization, updateOrganization, isLoading } = useOrganization();
-  const { register, handleSubmit, formState: { errors } } = useForm<OrganizationFormData>({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<OrganizationFormData>({
     resolver: zodResolver(organizationSchema),
-    defaultValues: organization
+    defaultValues: organization,
   });
 
   const onSubmit = async (data: OrganizationFormData) => {
@@ -37,15 +41,11 @@ export function OrganizationSettings() {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-      <div className="bg-white shadow rounded-lg p-6">
-        <h2 className="text-lg font-medium text-gray-900 mb-4">Organization Settings</h2>
-        
+      <div className="rounded-lg bg-white p-6 shadow">
+        <h2 className="mb-4 text-lg font-medium text-gray-900">Organization Settings</h2>
+
         <div className="space-y-4">
-          <Input
-            label="Organization Name"
-            {...register('name')}
-            error={errors.name?.message}
-          />
+          <Input label="Organization Name" {...register('name')} error={errors.name?.message} />
 
           <Input
             label="Domain"
@@ -90,9 +90,7 @@ export function OrganizationSettings() {
               {...register('settings.emailSettings.allowCustomization')}
               className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
             />
-            <span className="text-sm text-gray-700">
-              Allow users to customize their signatures
-            </span>
+            <span className="text-sm text-gray-700">Allow users to customize their signatures</span>
           </label>
         </div>
 

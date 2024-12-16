@@ -23,43 +23,27 @@ interface LocationFormProps {
 }
 
 export function LocationForm({ defaultValues, onSubmit, isLoading }: LocationFormProps) {
-  const { register, handleSubmit, formState: { errors } } = useForm<LocationFormData>({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LocationFormData>({
     resolver: zodResolver(locationSchema),
-    defaultValues: defaultValues
+    defaultValues: defaultValues,
   });
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-      <Input
-        label="Location Name"
-        {...register('name')}
-        error={errors.name?.message}
-      />
+      <Input label="Location Name" {...register('name')} error={errors.name?.message} />
 
-      <Input
-        label="Address"
-        {...register('address')}
-        error={errors.address?.message}
-      />
+      <Input label="Address" {...register('address')} error={errors.address?.message} />
 
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
-        <Input
-          label="City"
-          {...register('city')}
-          error={errors.city?.message}
-        />
+        <Input label="City" {...register('city')} error={errors.city?.message} />
 
-        <Input
-          label="State"
-          {...register('state')}
-          error={errors.state?.message}
-        />
+        <Input label="State" {...register('state')} error={errors.state?.message} />
 
-        <Input
-          label="Country"
-          {...register('country')}
-          error={errors.country?.message}
-        />
+        <Input label="Country" {...register('country')} error={errors.country?.message} />
       </div>
 
       <div className="flex justify-end">

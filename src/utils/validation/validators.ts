@@ -6,11 +6,7 @@ export async function validateData<T>(schema: z.Schema<T>, data: unknown): Promi
     return await schema.parseAsync(data);
   } catch (error) {
     if (error instanceof z.ZodError) {
-      throw new AppError(
-        error.errors[0].message,
-        'VALIDATION_ERROR',
-        { errors: error.errors }
-      );
+      throw new AppError(error.errors[0].message, 'VALIDATION_ERROR', { errors: error.errors });
     }
     throw error;
   }
@@ -21,11 +17,7 @@ export function validateSync<T>(schema: z.Schema<T>, data: unknown): T {
     return schema.parse(data);
   } catch (error) {
     if (error instanceof z.ZodError) {
-      throw new AppError(
-        error.errors[0].message,
-        'VALIDATION_ERROR',
-        { errors: error.errors }
-      );
+      throw new AppError(error.errors[0].message, 'VALIDATION_ERROR', { errors: error.errors });
     }
     throw error;
   }

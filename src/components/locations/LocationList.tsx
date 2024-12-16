@@ -41,17 +41,14 @@ export function LocationList() {
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-between items-center">
+      <div className="flex items-center justify-between">
         <h2 className="text-lg font-semibold">Locations</h2>
         <Button onClick={() => setIsAddDialogOpen(true)}>Add Location</Button>
       </div>
 
       <div className="divide-y divide-gray-200 rounded-md border">
-        {locations.map((location) => (
-          <div
-            key={location.id}
-            className="flex items-center justify-between p-4 hover:bg-gray-50"
-          >
+        {locations.map(location => (
+          <div key={location.id} className="flex items-center justify-between p-4 hover:bg-gray-50">
             <div>
               <h3 className="font-medium">{location.name}</h3>
               <p className="text-sm text-gray-500">

@@ -1,6 +1,6 @@
 import type { User } from './auth';
 
-export type AuditAction = 
+export type AuditAction =
   | 'user.login'
   | 'user.logout'
   | 'user.create'

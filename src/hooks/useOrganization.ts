@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuthStore } from '../store/authStore';
 import { useUIStore } from '../store/uiStore';
@@ -10,9 +10,10 @@ export function useOrganization() {
   const { user } = useAuthStore();
   const showToast = useUIStore(state => state.showToast);
 
-  const fetchOrganization = async () => {
+  const fetchOrganization = useCallback(async () => {
     if (!user?.organizationId) return;
 
+    setIsLoading(true);
     try {
       const { data, error } = await supabase
         .from('organizations')
@@ -28,11 +29,11 @@ export function useOrganization() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [user?.organizationId, showToast]);
 
   useEffect(() => {
     fetchOrganization();
-  }, [user?.organizationId]);
+  }, [fetchOrganization]);
 
   const updateOrganization = async (data: Partial<Organization>) => {
     if (!user?.organizationId) return;
@@ -59,6 +60,6 @@ export function useOrganization() {
   return {
     organization,
     isLoading,
-    updateOrganization
+    updateOrganization,
   };
 }

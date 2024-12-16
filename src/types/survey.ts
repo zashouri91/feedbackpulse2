@@ -33,7 +33,8 @@ export interface Survey {
   };
 }
 
-export interface SurveyTemplate extends Omit<Survey, 'id' | 'createdAt' | 'updatedAt' | 'createdBy' | 'isActive' | 'assignedTo'> {
+export interface SurveyTemplate
+  extends Omit<Survey, 'id' | 'createdAt' | 'updatedAt' | 'createdBy' | 'isActive' | 'assignedTo'> {
   id: string;
   category: string;
 }

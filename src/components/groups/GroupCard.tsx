@@ -27,13 +27,11 @@ export function GroupCard({ group, onDelete, onUpdate }: GroupCardProps) {
 
   return (
     <div className="relative flex items-center space-x-3 rounded-lg border border-gray-300 bg-white px-6 py-5 shadow-sm hover:border-gray-400">
-      <div className="flex-1 min-w-0">
+      <div className="min-w-0 flex-1">
         <h3 className="text-sm font-medium text-gray-900">{group.name}</h3>
-        {group.description && (
-          <p className="text-sm text-gray-500">{group.description}</p>
-        )}
+        {group.description && <p className="text-sm text-gray-500">{group.description}</p>}
       </div>
-      
+
       <div className="flex-shrink-0">
         <ActionsDropdown
           onEdit={() => setIsEditOpen(true)}
@@ -45,7 +43,7 @@ export function GroupCard({ group, onDelete, onUpdate }: GroupCardProps) {
         isOpen={isEditOpen}
         onClose={() => setIsEditOpen(false)}
         group={group}
-        onSubmit={(data) => onUpdate(group.id, data)}
+        onSubmit={data => onUpdate(group.id, data)}
       />
 
       <ConfirmDialog

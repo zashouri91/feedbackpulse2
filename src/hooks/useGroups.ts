@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../lib/supabase';
 import { useAuthStore } from '../store/authStore';
 import type { Group } from '../types/organization';
@@ -10,9 +10,9 @@ export function useGroups() {
   const [isLoading, setIsLoading] = useState(true);
   const { user } = useAuthStore();
 
-  const fetchGroups = async () => {
+  const fetchGroups = useCallback(async () => {
     if (!user?.organizationId) return;
-    
+
     try {
       const { data, error } = await supabase
         .from('groups')
@@ -26,7 +26,7 @@ export function useGroups() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [user?.organizationId]);
 
   useEffect(() => {
     let channel: RealtimeChannel;
@@ -48,9 +48,9 @@ export function useGroups() {
             table: 'groups',
             filter: `organization_id=eq.${user.organizationId}`,
           },
-          (payload) => {
+          payload => {
             console.log('Group inserted:', payload);
-            setGroups((current) => [...current, payload.new as Group]);
+            setGroups(current => [...current, payload.new as Group]);
           }
         )
         .on(
@@ -61,12 +61,10 @@ export function useGroups() {
             table: 'groups',
             filter: `organization_id=eq.${user.organizationId}`,
           },
-          (payload) => {
+          payload => {
             console.log('Group updated:', payload);
-            setGroups((current) =>
-              current.map((group) =>
-                group.id === payload.new.id ? (payload.new as Group) : group
-              )
+            setGroups(current =>
+              current.map(group => (group.id === payload.new.id ? (payload.new as Group) : group))
             );
           }
         )
@@ -78,11 +76,9 @@ export function useGroups() {
             table: 'groups',
             filter: `organization_id=eq.${user.organizationId}`,
           },
-          (payload) => {
+          payload => {
             console.log('Group deleted:', payload);
-            setGroups((current) =>
-              current.filter((group) => group.id !== payload.old.id)
-            );
+            setGroups(current => current.filter(group => group.id !== payload.old.id));
           }
         )
         .subscribe();
@@ -95,7 +91,7 @@ export function useGroups() {
         supabase.removeChannel(channel);
       }
     };
-  }, [user?.organizationId]);
+  }, [user?.organizationId, fetchGroups]);
 
   const addGroup = async (groupData: Partial<Group>) => {
     if (!user?.organizationId) {
@@ -103,7 +99,7 @@ export function useGroups() {
     }
 
     setIsLoading(true);
-    
+
     // Create a temporary ID for optimistic update
     const tempId = generateId();
     const tempGroup = {
@@ -111,19 +107,21 @@ export function useGroups() {
       ...groupData,
       organization_id: user.organizationId,
       created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
+      updated_at: new Date().toISOString(),
     } as Group;
-    
+
     // Optimistically add the group
     setGroups(current => [...current, tempGroup]);
 
     try {
       const { data, error } = await supabase
         .from('groups')
-        .insert([{
-          ...groupData,
-          organization_id: user.organizationId
-        }])
+        .insert([
+          {
+            ...groupData,
+            organization_id: user.organizationId,
+          },
+        ])
         .select()
         .single();
 
@@ -134,10 +132,8 @@ export function useGroups() {
       }
 
       // Replace temp group with real one
-      setGroups(current => 
-        current.map(group => group.id === tempId ? data : group)
-      );
-      
+      setGroups(current => current.map(group => (group.id === tempId ? data : group)));
+
       return data;
     } catch (error) {
       console.error('Error adding group:', error);
@@ -153,13 +149,13 @@ export function useGroups() {
     }
 
     setIsLoading(true);
-    
+
     // Store the original group for rollback
     const originalGroup = groups.find(group => group.id === id);
-    
+
     // Optimistically update the group
     setGroups(current =>
-      current.map(group => group.id === id ? { ...group, ...groupData } : group)
+      current.map(group => (group.id === id ? { ...group, ...groupData } : group))
     );
 
     try {
@@ -174,9 +170,7 @@ export function useGroups() {
       if (error) {
         // Revert optimistic update on error
         if (originalGroup) {
-          setGroups(current =>
-            current.map(group => group.id === id ? originalGroup : group)
-          );
+          setGroups(current => current.map(group => (group.id === id ? originalGroup : group)));
         }
         throw error;
       }
@@ -196,10 +190,10 @@ export function useGroups() {
     }
 
     setIsLoading(true);
-    
+
     // Store the group for rollback
     const deletedGroup = groups.find(group => group.id === id);
-    
+
     // Optimistically remove the group
     setGroups(current => current.filter(group => group.id !== id));
 
@@ -224,6 +218,10 @@ export function useGroups() {
       setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchGroups();
+  }, [fetchGroups]);
 
   return {
     groups,

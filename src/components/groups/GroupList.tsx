@@ -23,23 +23,19 @@ interface GroupFormProps {
 }
 
 function GroupForm({ defaultValues, onSubmit, isLoading }: GroupFormProps) {
-  const { register, handleSubmit, formState: { errors } } = useForm<GroupFormData>({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<GroupFormData>({
     resolver: zodResolver(groupSchema),
     defaultValues,
   });
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-      <Input
-        label="Group Name"
-        {...register('name')}
-        error={errors.name?.message}
-      />
-      <Input
-        label="Description"
-        {...register('description')}
-        error={errors.description?.message}
-      />
+      <Input label="Group Name" {...register('name')} error={errors.name?.message} />
+      <Input label="Description" {...register('description')} error={errors.description?.message} />
       <div className="flex justify-end">
         <Button type="submit" disabled={isLoading}>
           {isLoading ? 'Saving...' : defaultValues ? 'Save Changes' : 'Add Group'}
@@ -64,11 +60,7 @@ function GroupDialog({ group, isOpen, onClose, onSubmit, isLoading }: GroupDialo
         <DialogHeader>
           <DialogTitle>{group ? 'Edit Group' : 'Add Group'}</DialogTitle>
         </DialogHeader>
-        <GroupForm
-          defaultValues={group}
-          onSubmit={onSubmit}
-          isLoading={isLoading}
-        />
+        <GroupForm defaultValues={group} onSubmit={onSubmit} isLoading={isLoading} />
       </DialogContent>
     </Dialog>
   );
@@ -109,27 +101,19 @@ export function GroupList() {
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-between items-center">
+      <div className="flex items-center justify-between">
         <h2 className="text-lg font-semibold">Groups</h2>
         <Button onClick={() => setIsAddDialogOpen(true)}>Add Group</Button>
       </div>
 
       <div className="divide-y divide-gray-200 rounded-md border">
-        {groups.map((group) => (
-          <div
-            key={group.id}
-            className="flex items-center justify-between p-4 hover:bg-gray-50"
-          >
+        {groups.map(group => (
+          <div key={group.id} className="flex items-center justify-between p-4 hover:bg-gray-50">
             <div>
               <h3 className="font-medium">{group.name}</h3>
-              {group.description && (
-                <p className="text-sm text-gray-500">{group.description}</p>
-              )}
+              {group.description && <p className="text-sm text-gray-500">{group.description}</p>}
             </div>
-            <ItemMenu
-              onEdit={() => setEditGroup(group)}
-              onDelete={() => handleDelete(group)}
-            />
+            <ItemMenu onEdit={() => setEditGroup(group)} onDelete={() => handleDelete(group)} />
           </div>
         ))}
         {groups.length === 0 && !isLoading && (

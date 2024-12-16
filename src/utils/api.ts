@@ -23,17 +23,10 @@ export async function handleApiResponse<T>(
 export const api = {
   auth: {
     signIn: (email: string, password: string) =>
-      handleApiResponse(
-        supabase.auth.signInWithPassword({ email, password })
-      ),
+      handleApiResponse(supabase.auth.signInWithPassword({ email, password })),
     signUp: (email: string, password: string) =>
-      handleApiResponse(
-        supabase.auth.signUp({ email, password })
-      ),
-    signOut: () =>
-      handleApiResponse(
-        supabase.auth.signOut()
-      )
+      handleApiResponse(supabase.auth.signUp({ email, password })),
+    signOut: () => handleApiResponse(supabase.auth.signOut()),
   },
   // Add other API endpoints here
 };

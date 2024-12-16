@@ -41,7 +41,7 @@ export default function LocationList() {
         </div>
         <div className="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
           <Button onClick={() => setIsAddLocationOpen(true)}>
-            <Plus className="h-4 w-4 mr-2" />
+            <Plus className="mr-2 h-4 w-4" />
             Add Location
           </Button>
         </div>
@@ -50,7 +50,7 @@ export default function LocationList() {
       <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {isLoading ? (
           <div className="col-span-full flex items-center justify-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
+            <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-t-2 border-blue-500"></div>
           </div>
         ) : locations.length === 0 ? (
           <div className="col-span-full flex items-center justify-center rounded-lg border-2 border-dashed border-gray-300 p-12">
@@ -60,14 +60,14 @@ export default function LocationList() {
               <p className="mt-1 text-sm text-gray-500">Get started by adding a new location.</p>
               <div className="mt-6">
                 <Button size="sm" onClick={() => setIsAddLocationOpen(true)}>
-                  <Plus className="h-4 w-4 mr-2" />
+                  <Plus className="mr-2 h-4 w-4" />
                   Add Location
                 </Button>
               </div>
             </div>
           </div>
         ) : (
-          locations.map((location) => (
+          locations.map(location => (
             <div
               key={location.id}
               className="relative flex flex-col space-y-2 rounded-lg border border-gray-300 bg-white p-6 shadow-sm hover:border-gray-400"
@@ -92,11 +92,8 @@ export default function LocationList() {
         )}
       </div>
 
-      <AddLocationDialog
-        isOpen={isAddLocationOpen}
-        onClose={() => setIsAddLocationOpen(false)}
-      />
-      
+      <AddLocationDialog isOpen={isAddLocationOpen} onClose={() => setIsAddLocationOpen(false)} />
+
       {editLocation && (
         <EditLocationDialog
           location={editLocation}

@@ -35,33 +35,31 @@ const roles: { label: string; value: Role }[] = [
 export function UserForm({ defaultValues, onSubmit, isLoading }: UserFormProps) {
   const { groups } = useGroups();
   const { locations } = useLocations();
-  
-  const { register, handleSubmit, formState: { errors } } = useForm<UserFormData>({
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<UserFormData>({
     resolver: zodResolver(userSchema),
-    defaultValues: defaultValues ? {
-      firstName: defaultValues.firstName,
-      lastName: defaultValues.lastName,
-      email: defaultValues.email,
-      role: defaultValues.role,
-      groupId: defaultValues.groupId,
-      locationId: defaultValues.locationId,
-    } : undefined
+    defaultValues: defaultValues
+      ? {
+          firstName: defaultValues.firstName,
+          lastName: defaultValues.lastName,
+          email: defaultValues.email,
+          role: defaultValues.role,
+          groupId: defaultValues.groupId,
+          locationId: defaultValues.locationId,
+        }
+      : undefined,
   });
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
-        <Input
-          label="First Name"
-          {...register('firstName')}
-          error={errors.firstName?.message}
-        />
-        
-        <Input
-          label="Last Name"
-          {...register('lastName')}
-          error={errors.lastName?.message}
-        />
+        <Input label="First Name" {...register('firstName')} error={errors.firstName?.message} />
+
+        <Input label="Last Name" {...register('lastName')} error={errors.lastName?.message} />
       </div>
 
       <Input
@@ -71,39 +69,27 @@ export function UserForm({ defaultValues, onSubmit, isLoading }: UserFormProps) 
         error={errors.email?.message}
       />
 
-      <Select
-        label="Role"
-        {...register('role')}
-        error={errors.role?.message}
-      >
+      <Select label="Role" {...register('role')} error={errors.role?.message}>
         <option value="">Select a role</option>
-        {roles.map((role) => (
+        {roles.map(role => (
           <option key={role.value} value={role.value}>
             {role.label}
           </option>
         ))}
       </Select>
 
-      <Select
-        label="Group"
-        {...register('groupId')}
-        error={errors.groupId?.message}
-      >
+      <Select label="Group" {...register('groupId')} error={errors.groupId?.message}>
         <option value="">Select a group</option>
-        {groups?.map((group) => (
+        {groups?.map(group => (
           <option key={group.id} value={group.id}>
             {group.name}
           </option>
         ))}
       </Select>
 
-      <Select
-        label="Location"
-        {...register('locationId')}
-        error={errors.locationId?.message}
-      >
+      <Select label="Location" {...register('locationId')} error={errors.locationId?.message}>
         <option value="">Select a location</option>
-        {locations?.map((location) => (
+        {locations?.map(location => (
           <option key={location.id} value={location.id}>
             {location.name}
           </option>

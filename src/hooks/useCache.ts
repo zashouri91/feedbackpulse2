@@ -1,11 +1,7 @@
 import { useState, useEffect } from 'react';
 import { cache } from '../utils/cache';
 
-export function useCache<T>(
-  key: string,
-  fetcher: () => Promise<T>,
-  ttl?: number
-) {
+export function useCache<T>(key: string, fetcher: () => Promise<T>, ttl?: number) {
   const [data, setData] = useState<T | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
@@ -14,7 +10,7 @@ export function useCache<T>(
     const fetchData = async () => {
       try {
         setIsLoading(true);
-        
+
         // Try to get from cache first
         const cachedData = cache.get<T>(key);
         if (cachedData) {
@@ -35,7 +31,13 @@ export function useCache<T>(
     };
 
     fetchData();
-  }, [key, ttl]);
+  }, [key, ttl, fetcher]);
+
+  useEffect(() => {
+    if (!data && !error && !isLoading) {
+      void fetcher();
+    }
+  }, [data, error, isLoading, fetcher]);
 
   return { data, isLoading, error };
 }

@@ -19,17 +19,8 @@ export function EditGroupDialog({
   isLoading,
 }: EditGroupDialogProps) {
   return (
-    <ConfirmDialog
-      title="Edit Group"
-      isOpen={isOpen}
-      onClose={onClose}
-      showConfirm={false}
-    >
-      <GroupForm
-        defaultValues={group}
-        onSubmit={onSubmit}
-        isLoading={isLoading}
-      />
+    <ConfirmDialog title="Edit Group" isOpen={isOpen} onClose={onClose} showConfirm={false}>
+      <GroupForm defaultValues={group} onSubmit={onSubmit} isLoading={isLoading} />
     </ConfirmDialog>
   );
 }

@@ -11,11 +11,11 @@ export default function Dashboard() {
 
   return (
     <div>
-      <h2 className="text-2xl font-bold text-gray-900 mb-8">Dashboard Overview</h2>
-      
+      <h2 className="mb-8 text-2xl font-bold text-gray-900">Dashboard Overview</h2>
+
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        {stats.map((stat) => (
-          <div key={stat.label} className="bg-white overflow-hidden rounded-lg shadow">
+        {stats.map(stat => (
+          <div key={stat.label} className="overflow-hidden rounded-lg bg-white shadow">
             <div className="p-5">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
@@ -23,7 +23,7 @@ export default function Dashboard() {
                 </div>
                 <div className="ml-5 w-0 flex-1">
                   <dl>
-                    <dt className="text-sm font-medium text-gray-500 truncate">{stat.label}</dt>
+                    <dt className="truncate text-sm font-medium text-gray-500">{stat.label}</dt>
                     <dd className="flex items-baseline">
                       <div className="text-2xl font-semibold text-gray-900">{stat.value}</div>
                       <div className="ml-2 flex items-baseline text-sm font-semibold text-green-600">
@@ -40,16 +40,16 @@ export default function Dashboard() {
 
       <div className="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-2">
         {/* Placeholder for charts - we'll add real charts later */}
-        <div className="bg-white rounded-lg shadow p-6 min-h-[400px]">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">Response Trends</h3>
-          <div className="flex items-center justify-center h-full">
+        <div className="min-h-[400px] rounded-lg bg-white p-6 shadow">
+          <h3 className="mb-4 text-lg font-medium text-gray-900">Response Trends</h3>
+          <div className="flex h-full items-center justify-center">
             <p className="text-gray-500">Chart coming soon...</p>
           </div>
         </div>
-        
-        <div className="bg-white rounded-lg shadow p-6 min-h-[400px]">
-          <h3 className="text-lg font-medium text-gray-900 mb-4">Feedback Distribution</h3>
-          <div className="flex items-center justify-center h-full">
+
+        <div className="min-h-[400px] rounded-lg bg-white p-6 shadow">
+          <h3 className="mb-4 text-lg font-medium text-gray-900">Feedback Distribution</h3>
+          <div className="flex h-full items-center justify-center">
             <p className="text-gray-500">Chart coming soon...</p>
           </div>
         </div>

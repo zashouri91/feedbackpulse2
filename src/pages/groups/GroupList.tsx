@@ -41,7 +41,7 @@ export default function GroupList() {
         </div>
         <div className="mt-4 sm:ml-16 sm:mt-0 sm:flex-none">
           <Button onClick={() => setIsAddGroupOpen(true)}>
-            <Plus className="h-4 w-4 mr-2" />
+            <Plus className="mr-2 h-4 w-4" />
             Add Group
           </Button>
         </div>
@@ -50,7 +50,7 @@ export default function GroupList() {
       <div className="mt-8">
         {isLoading ? (
           <div className="flex items-center justify-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
+            <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-t-2 border-blue-500"></div>
           </div>
         ) : groups.length === 0 ? (
           <div className="flex items-center justify-center rounded-lg border-2 border-dashed border-gray-300 p-12">
@@ -60,7 +60,7 @@ export default function GroupList() {
               <p className="mt-1 text-sm text-gray-500">Get started by creating a new group.</p>
               <div className="mt-6">
                 <Button size="sm" onClick={() => setIsAddGroupOpen(true)}>
-                  <Plus className="h-4 w-4 mr-2" />
+                  <Plus className="mr-2 h-4 w-4" />
                   Add Group
                 </Button>
               </div>
@@ -68,32 +68,26 @@ export default function GroupList() {
           </div>
         ) : (
           <div className="space-y-4">
-            {groups.map((group) => (
+            {groups.map(group => (
               <div
                 key={group.id}
                 className="relative flex items-center space-x-3 rounded-lg border border-gray-300 bg-white px-6 py-5 shadow-sm hover:border-gray-400"
               >
-                <div className="flex-1 min-w-0">
+                <div className="min-w-0 flex-1">
                   <h3 className="text-sm font-medium text-gray-900">{group.name}</h3>
                   {group.description && (
                     <p className="text-sm text-gray-500">{group.description}</p>
                   )}
                 </div>
-                <ItemMenu
-                  onEdit={() => setEditGroup(group)}
-                  onDelete={() => handleDelete(group)}
-                />
+                <ItemMenu onEdit={() => setEditGroup(group)} onDelete={() => handleDelete(group)} />
               </div>
             ))}
           </div>
         )}
       </div>
 
-      <AddGroupDialog
-        isOpen={isAddGroupOpen}
-        onClose={() => setIsAddGroupOpen(false)}
-      />
-      
+      <AddGroupDialog isOpen={isAddGroupOpen} onClose={() => setIsAddGroupOpen(false)} />
+
       {editGroup && (
         <EditGroupDialog
           group={editGroup}

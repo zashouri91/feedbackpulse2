@@ -12,8 +12,8 @@ export default function DashboardLayout() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-t-2 border-blue-500"></div>
       </div>
     );
   }
@@ -26,11 +26,8 @@ export default function DashboardLayout() {
     <div className="min-h-screen bg-gray-50">
       <TopBar />
       <Sidebar />
-      <main className={cn(
-        "lg:pl-64 transition-all duration-300",
-        isCollapsed && "lg:pl-0"
-      )}>
-        <div className="max-w-7xl mx-auto p-6">
+      <main className={cn('transition-all duration-300 lg:pl-64', isCollapsed && 'lg:pl-0')}>
+        <div className="mx-auto max-w-7xl p-6">
           <Outlet />
         </div>
       </main>

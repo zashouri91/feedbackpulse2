@@ -1,13 +1,15 @@
-import { useEffect } from 'react';
+import { useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Session } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
 import { useAuthStore } from '../store/authStore';
 import { useAuditLog } from './useAuditLog';
-import type { User } from '../types/auth';
+import type { User, AuthUser, UserProfile } from '../types/auth';
 
 export function useAuth() {
   const navigate = useNavigate();
-  const { setUser, clearUser, setLoading, setError, initialize } = useAuthStore();
+  const { setUser, clearUser, setLoading, setError, setInitialized } =
+    useAuthStore();
   const { logAction } = useAuditLog();
 
   const fetchUserProfile = async (userId: string) => {
@@ -30,7 +32,7 @@ export function useAuth() {
       .from('organizations')
       .insert({
         name: 'My Organization',
-        domain: email?.split('@')[1]
+        domain: email?.split('@')[1],
       })
       .select()
       .single();
@@ -47,7 +49,7 @@ export function useAuth() {
         email: email,
         full_name: fullName || email?.split('@')[0],
         role: 'admin', // First user is admin
-        organization_id: org.id
+        organization_id: org.id,
       })
       .select()
       .single();
@@ -59,135 +61,111 @@ export function useAuth() {
     return { profile, org };
   };
 
-  useEffect(() => {
-    let mounted = true;
-
-    const initializeAuth = async () => {
+  const handleUserSession = useCallback(
+    async (session: Session) => {
       try {
         setLoading(true);
+        console.log('Handling user session for:', session.user.id);
+        let profile;
 
-        // First try to get the session
-        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-        
-        if (sessionError) {
-          console.error('Error getting session:', sessionError);
-          throw sessionError;
+        try {
+          profile = await fetchUserProfile(session.user.id);
+          console.log('Fetched user profile:', profile.id);
+        } catch (error: any) {
+          console.error('Error fetching profile:', error);
+          // If no profile exists, create one
+          if (error.code === 'PGRST116') {
+            console.log('Creating new profile for user:', session.user.id);
+            const { profile: newProfile } = await createUserProfile(
+              session.user.id,
+              session.user.email,
+              session.user.user_metadata?.full_name
+            );
+            profile = newProfile;
+            await logAction('user.create');
+          } else {
+            throw error;
+          }
         }
 
-        console.log('Initial session:', session?.user?.id);
-        
-        if (session?.user && mounted) {
-          await handleUserSession(session.user);
-        } else if (mounted) {
-          clearUser();
-        }
+        const user: User = {
+          id: profile.id,
+          email: profile.email,
+          name: profile.full_name,
+          role: profile.role,
+          groupId: profile.group_id,
+          locationId: profile.location_id,
+          organizationId: profile.organization_id,
+        };
+
+        console.log('Setting user in store:', user.id);
+        setUser(user);
+        return user;
       } catch (error) {
-        console.error('Error initializing auth:', error);
-        if (mounted) {
-          clearUser();
-        }
+        console.error('Error handling user session:', error);
+        setError(error instanceof Error ? error.message : 'Failed to handle user session');
+        clearUser();
+        throw error;
       } finally {
-        if (mounted) {
-          initialize();
+        setLoading(false);
+      }
+    },
+    [clearUser, setError, logAction, setUser, setLoading]
+  );
+
+  useEffect(() => {
+    const setupAuth = async () => {
+      const {
+        data: { subscription },
+      } = supabase.auth.onAuthStateChange(async (event, session) => {
+        setLoading(true);
+        try {
+          if (event === 'SIGNED_IN' && session) {
+            await handleUserSession(session);
+          } else if (event === 'SIGNED_OUT') {
+            clearUser();
+          }
+        } catch (error) {
+          console.error('Auth state change error:', error);
+        } finally {
           setLoading(false);
         }
+      });
+
+      const {
+        data: { session },
+        error,
+      } = await supabase.auth.getSession();
+      if (error) throw error;
+
+      if (session?.user) {
+        await handleUserSession(session);
+      } else {
+        clearUser();
       }
+
+      setInitialized(true);
     };
 
-    // Initialize auth on mount
-    initializeAuth();
-
-    // Set up auth state change listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        console.log('Auth state changed:', event, session?.user?.id);
-        
-        switch (event) {
-          case 'INITIAL_SESSION':
-            if (session?.user && mounted) {
-              await handleUserSession(session.user);
-            }
-            break;
-          case 'SIGNED_IN':
-            if (session?.user && mounted) {
-              await handleUserSession(session.user);
-            }
-            break;
-          case 'SIGNED_OUT':
-            if (mounted) {
-              clearUser();
-            }
-            break;
-          case 'TOKEN_REFRESHED':
-            if (session?.user && mounted) {
-              await handleUserSession(session.user);
-            }
-            break;
-          default:
-            console.log('Unhandled auth event:', event);
-        }
-      }
-    );
+    setupAuth();
 
     return () => {
-      mounted = false;
-      subscription.unsubscribe();
+      supabase.auth.onAuthStateChange((_, __) => {});
     };
-  }, []);
-
-  const handleUserSession = async (sessionUser: any) => {
-    try {
-      setLoading(true);
-      console.log('Handling user session for:', sessionUser.id);
-      let profile;
-
-      try {
-        profile = await fetchUserProfile(sessionUser.id);
-        console.log('Fetched user profile:', profile.id);
-      } catch (error: any) {
-        console.error('Error fetching profile:', error);
-        // If no profile exists, create one
-        if (error.code === 'PGRST116') {
-          console.log('Creating new profile for user:', sessionUser.id);
-          const { profile: newProfile } = await createUserProfile(
-            sessionUser.id,
-            sessionUser.email,
-            sessionUser.user_metadata?.full_name
-          );
-          profile = newProfile;
-          await logAction('user.create');
-        } else {
-          throw error;
-        }
-      }
-
-      const user: User = {
-        id: profile.id,
-        email: profile.email,
-        name: profile.full_name,
-        role: profile.role,
-        groupId: profile.group_id,
-        locationId: profile.location_id,
-        organizationId: profile.organization_id
-      };
-      
-      console.log('Setting user in store:', user.id);
-      setUser(user);
-    } catch (error) {
-      console.error('Error handling user session:', error);
-      setError(error instanceof Error ? error.message : 'Failed to handle user session');
-      clearUser();
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, [clearUser, handleUserSession, setInitialized, setLoading]);
 
   const signIn = async (email: string, password: string) => {
     try {
       setLoading(true);
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) throw error;
+      
+      // Wait for the user session to be handled and get the user
+      const user = await handleUserSession(data.session);
+      
+      // Now that we have the user with organization_id, we can log the action
       await logAction('user.login');
+      
       return { data, error: null };
     } catch (error) {
       console.error('Error signing in:', error);
@@ -217,6 +195,9 @@ export function useAuth() {
 
   return {
     signIn,
-    signOut
+    signOut,
+    isLoading: useAuthStore(state => state.loading),
+    isInitialized: useAuthStore(state => state.isInitialized),
+    user: useAuthStore(state => state.user),
   };
 }

@@ -16,7 +16,7 @@ export function useBatchSelection<T extends { id: string }>(items: T[]) {
   }, []);
 
   const toggleAll = useCallback(() => {
-    setSelectedIds(prev => 
+    setSelectedIds(prev =>
       prev.size === items.length ? new Set() : new Set(items.map(item => item.id))
     );
   }, [items]);

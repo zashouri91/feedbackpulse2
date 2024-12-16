@@ -49,9 +49,9 @@ export function SurveyCard({ survey, onDelete }: SurveyCardProps) {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 hover:border-gray-300 transition-colors">
+    <div className="rounded-lg border border-gray-200 bg-white shadow-sm transition-colors hover:border-gray-300">
       <div className="p-6">
-        <div className="flex justify-between items-start">
+        <div className="flex items-start justify-between">
           <div>
             <h3 className="text-lg font-medium text-gray-900">{survey.title}</h3>
             <p className="mt-1 text-sm text-gray-500">{survey.description}</p>
@@ -60,26 +60,26 @@ export function SurveyCard({ survey, onDelete }: SurveyCardProps) {
             actions={[
               { label: 'Edit', onClick: handleEdit },
               { label: 'Preview', onClick: handlePreview },
-              { label: 'Delete', onClick: () => setIsDeleteOpen(true), variant: 'danger' }
+              { label: 'Delete', onClick: () => setIsDeleteOpen(true), variant: 'danger' },
             ]}
           />
         </div>
 
         <div className="mt-4 grid grid-cols-2 gap-4">
           <div className="flex items-center text-sm text-gray-500">
-            <Calendar className="h-4 w-4 mr-2" />
+            <Calendar className="mr-2 h-4 w-4" />
             Created {formatDate(survey.createdAt)}
           </div>
           <div className="flex items-center text-sm text-gray-500">
-            <BarChart className="h-4 w-4 mr-2" />
+            <BarChart className="mr-2 h-4 w-4" />
             {survey.responseCount || 0} responses
           </div>
           <div className="flex items-center text-sm text-gray-500">
-            <Users className="h-4 w-4 mr-2" />
+            <Users className="mr-2 h-4 w-4" />
             {getAssignmentSummary()}
           </div>
           <div className="flex items-center text-sm text-gray-500">
-            <MapPin className="h-4 w-4 mr-2" />
+            <MapPin className="mr-2 h-4 w-4" />
             {survey.isActive ? 'Active' : 'Draft'}
           </div>
         </div>

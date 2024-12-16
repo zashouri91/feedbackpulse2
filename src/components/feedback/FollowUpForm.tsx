@@ -13,7 +13,7 @@ const followUpSchema = z.object({
   comment: z.string().optional(),
   answers: z.record(z.string()).optional(),
   contact: z.boolean().optional(),
-  email: z.string().email().optional()
+  email: z.string().email().optional(),
 });
 
 type FollowUpData = z.infer<typeof followUpSchema>;
@@ -31,14 +31,19 @@ export function FollowUpForm({
   questions,
   reasons,
   onSubmit,
-  isLoading
+  isLoading,
 }: FollowUpFormProps) {
-  const { register, handleSubmit, watch, formState: { errors } } = useForm<FollowUpData>({
+  const {
+    register,
+    handleSubmit,
+    watch,
+    formState: { errors },
+  } = useForm<FollowUpData>({
     resolver: zodResolver(followUpSchema),
     defaultValues: {
       rating: initialRating,
-      contact: false
-    }
+      contact: false,
+    },
   });
 
   const wantsContact = watch('contact');
@@ -66,7 +71,7 @@ export function FollowUpForm({
             error={errors.answers?.[question.id]?.message}
           >
             <option value="">Select an option</option>
-            {question.options?.map((option) => (
+            {question.options?.map(option => (
               <option key={option} value={option}>
                 {option}
               </option>
@@ -87,7 +92,7 @@ export function FollowUpForm({
         error={errors.reason?.message}
       >
         <option value="">Select a reason</option>
-        {reasons.map((reason) => (
+        {reasons.map(reason => (
           <option key={reason} value={reason}>
             {reason}
           </option>
@@ -112,9 +117,7 @@ export function FollowUpForm({
             {...register('contact')}
             className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
           />
-          <span className="text-sm text-gray-700">
-            I'd like to be contacted about my feedback
-          </span>
+          <span className="text-sm text-gray-700">I'd like to be contacted about my feedback</span>
         </label>
 
         {wantsContact && (

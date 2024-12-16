@@ -15,7 +15,7 @@ class RateLimiter {
     if (!limit || now >= limit.resetAt) {
       this.limits.set(key, {
         count: 1,
-        resetAt: now + this.window
+        resetAt: now + this.window,
       });
       return false;
     }

@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
-import { Palette, Image, Type, Layout } from 'lucide-react';
 import { Input } from '../ui/Input';
 import { Select } from '../ui/Select';
-import { Button } from '../ui/Button';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '../ui/Tabs';
 import { colorSchema, urlSchema } from '../../utils/validation';
 
@@ -28,7 +26,7 @@ export function SignatureDesigner({ initialData, onChange }: SignatureDesignerPr
     logo: '',
     primaryColor: '#2563eb',
     layout: 'vertical' as const,
-    ...initialData
+    ...initialData,
   });
 
   const handleChange = (field: string, value: string) => {
@@ -55,15 +53,15 @@ export function SignatureDesigner({ initialData, onChange }: SignatureDesignerPr
       <Tabs defaultValue="content">
         <TabsList>
           <TabsTrigger value="content">
-            <Type className="h-4 w-4 mr-2" />
+            <Type className="mr-2 h-4 w-4" />
             Content
           </TabsTrigger>
           <TabsTrigger value="style">
-            <Palette className="h-4 w-4 mr-2" />
+            <Palette className="mr-2 h-4 w-4" />
             Style
           </TabsTrigger>
           <TabsTrigger value="layout">
-            <Layout className="h-4 w-4 mr-2" />
+            <Layout className="mr-2 h-4 w-4" />
             Layout
           </TabsTrigger>
         </TabsList>
@@ -72,24 +70,24 @@ export function SignatureDesigner({ initialData, onChange }: SignatureDesignerPr
           <Input
             label="Full Name"
             value={data.name}
-            onChange={(e) => handleChange('name', e.target.value)}
+            onChange={e => handleChange('name', e.target.value)}
           />
           <Input
             label="Job Title"
             value={data.title}
-            onChange={(e) => handleChange('title', e.target.value)}
+            onChange={e => handleChange('title', e.target.value)}
           />
           <Input
             label="Email Address"
             type="email"
             value={data.email}
-            onChange={(e) => handleChange('email', e.target.value)}
+            onChange={e => handleChange('email', e.target.value)}
           />
           <Input
             label="Phone Number"
             type="tel"
             value={data.phone}
-            onChange={(e) => handleChange('phone', e.target.value)}
+            onChange={e => handleChange('phone', e.target.value)}
           />
         </TabsContent>
 
@@ -98,14 +96,14 @@ export function SignatureDesigner({ initialData, onChange }: SignatureDesignerPr
             label="Logo URL"
             type="url"
             value={data.logo}
-            onChange={(e) => handleChange('logo', e.target.value)}
+            onChange={e => handleChange('logo', e.target.value)}
             error={!validateField('logo', data.logo) ? 'Invalid URL' : undefined}
           />
           <Input
             label="Primary Color"
             type="color"
             value={data.primaryColor}
-            onChange={(e) => handleChange('primaryColor', e.target.value)}
+            onChange={e => handleChange('primaryColor', e.target.value)}
           />
         </TabsContent>
 
@@ -113,7 +111,7 @@ export function SignatureDesigner({ initialData, onChange }: SignatureDesignerPr
           <Select
             label="Layout Style"
             value={data.layout}
-            onChange={(e) => handleChange('layout', e.target.value)}
+            onChange={e => handleChange('layout', e.target.value)}
           >
             <option value="vertical">Vertical</option>
             <option value="horizontal">Horizontal</option>

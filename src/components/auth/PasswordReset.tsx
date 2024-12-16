@@ -8,7 +8,7 @@ import { useAuth } from '../../hooks/useAuth';
 import { useUIStore } from '../../store/uiStore';
 
 const resetSchema = z.object({
-  email: z.string().email('Please enter a valid email address')
+  email: z.string().email('Please enter a valid email address'),
 });
 
 type ResetFormData = z.infer<typeof resetSchema>;
@@ -16,8 +16,12 @@ type ResetFormData = z.infer<typeof resetSchema>;
 export function PasswordReset() {
   const { resetPassword } = useAuth();
   const showToast = useUIStore(state => state.showToast);
-  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<ResetFormData>({
-    resolver: zodResolver(resetSchema)
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<ResetFormData>({
+    resolver: zodResolver(resetSchema),
   });
 
   const onSubmit = async (data: ResetFormData) => {

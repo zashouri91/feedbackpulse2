@@ -22,13 +22,13 @@ export function SurveyFilters({ filters, onChange }: SurveyFiltersProps) {
   const { locations } = useLocations();
 
   return (
-    <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+    <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <div className="relative">
           <Input
             placeholder="Search surveys..."
             value={filters.search}
-            onChange={(e) => onChange({ ...filters, search: e.target.value })}
+            onChange={e => onChange({ ...filters, search: e.target.value })}
             className="pl-10"
           />
           <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-400" />
@@ -36,7 +36,7 @@ export function SurveyFilters({ filters, onChange }: SurveyFiltersProps) {
 
         <Select
           value={filters.status}
-          onChange={(e) => onChange({ ...filters, status: e.target.value })}
+          onChange={e => onChange({ ...filters, status: e.target.value })}
         >
           <option value="all">All Status</option>
           <option value="active">Active</option>
@@ -45,10 +45,10 @@ export function SurveyFilters({ filters, onChange }: SurveyFiltersProps) {
 
         <Select
           value={filters.groupId || ''}
-          onChange={(e) => onChange({ ...filters, groupId: e.target.value })}
+          onChange={e => onChange({ ...filters, groupId: e.target.value })}
         >
           <option value="">All Groups</option>
-          {groups?.map((group) => (
+          {groups?.map(group => (
             <option key={group.id} value={group.id}>
               {group.name}
             </option>
@@ -57,10 +57,10 @@ export function SurveyFilters({ filters, onChange }: SurveyFiltersProps) {
 
         <Select
           value={filters.locationId || ''}
-          onChange={(e) => onChange({ ...filters, locationId: e.target.value })}
+          onChange={e => onChange({ ...filters, locationId: e.target.value })}
         >
           <option value="">All Locations</option>
-          {locations?.map((location) => (
+          {locations?.map(location => (
             <option key={location.id} value={location.id}>
               {location.name}
             </option>
@@ -68,10 +68,10 @@ export function SurveyFilters({ filters, onChange }: SurveyFiltersProps) {
         </Select>
       </div>
 
-      <div className="mt-4 flex justify-between items-center">
+      <div className="mt-4 flex items-center justify-between">
         <Select
           value={filters.sortBy}
-          onChange={(e) => onChange({ ...filters, sortBy: e.target.value })}
+          onChange={e => onChange({ ...filters, sortBy: e.target.value })}
           className="w-48"
         >
           <option value="created">Sort by Date Created</option>
@@ -82,15 +82,17 @@ export function SurveyFilters({ filters, onChange }: SurveyFiltersProps) {
         <Button
           variant="outline"
           size="sm"
-          onClick={() => onChange({
-            search: '',
-            status: 'all',
-            groupId: '',
-            locationId: '',
-            sortBy: 'created'
-          })}
+          onClick={() =>
+            onChange({
+              search: '',
+              status: 'all',
+              groupId: '',
+              locationId: '',
+              sortBy: 'created',
+            })
+          }
         >
-          <Filter className="h-4 w-4 mr-2" />
+          <Filter className="mr-2 h-4 w-4" />
           Reset Filters
         </Button>
       </div>

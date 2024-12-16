@@ -10,7 +10,7 @@ export function useRealTimeAnalytics(surveyId?: string) {
   }>({
     recentResponses: [],
     activeUsers: 0,
-    responseRate: 0
+    responseRate: 0,
   });
 
   useEffect(() => {
@@ -23,13 +23,16 @@ export function useRealTimeAnalytics(surveyId?: string) {
           event: 'INSERT',
           schema: 'public',
           table: 'feedback_responses',
-          filter: surveyId ? `survey_id=eq.${surveyId}` : undefined
+          filter: surveyId ? `survey_id=eq.${surveyId}` : undefined,
         },
-        (payload) => {
+        payload => {
           setRealTimeData(prev => ({
             ...prev,
-            recentResponses: [payload.new as FeedbackResponse, ...prev.recentResponses].slice(0, 10),
-            responseRate: calculateResponseRate(prev.recentResponses.length + 1)
+            recentResponses: [payload.new as FeedbackResponse, ...prev.recentResponses].slice(
+              0,
+              10
+            ),
+            responseRate: calculateResponseRate(prev.recentResponses.length + 1),
           }));
         }
       )

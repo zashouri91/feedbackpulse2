@@ -1,15 +1,10 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { handleApiResponse } from '../utils/api';
-import type { FeedbackStats } from '../types/feedback';
+import type { FeedbackStats, AnalyticsData, FilterOptions } from '../types/feedback';
 import { useUIStore } from '../store/uiStore';
 
-export function useAnalytics(filters?: {
-  startDate?: Date;
-  endDate?: Date;
-  groupId?: string;
-  locationId?: string;
-}) {
+export function useAnalytics(filters?: FilterOptions) {
   const [stats, setStats] = useState<FeedbackStats | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const showToast = useUIStore(state => state.showToast);
@@ -18,7 +13,7 @@ export function useAnalytics(filters?: {
     const fetchStats = async () => {
       try {
         setIsLoading(true);
-        
+
         // Fetch feedback responses with filters
         const query = supabase
           .from('feedback_responses')
@@ -47,7 +42,7 @@ export function useAnalytics(filters?: {
           responseRate: calculateResponseRate(responses),
           ratingDistribution: calculateRatingDistribution(responses),
           commonReasons: calculateCommonReasons(responses),
-          recentTrend: calculateRecentTrend(responses)
+          recentTrend: calculateRecentTrend(responses),
         };
 
         setStats(stats);
@@ -89,7 +84,9 @@ function calculateCommonReasons(responses: any[]): Array<{ reason: string; count
     .slice(0, 5);
 }
 
-function calculateRecentTrend(responses: any[]): Array<{ date: string; averageRating: number; responses: number }> {
+function calculateRecentTrend(
+  responses: any[]
+): Array<{ date: string; averageRating: number; responses: number }> {
   const last30Days = Array.from({ length: 30 }, (_, i) => {
     const date = new Date();
     date.setDate(date.getDate() - i);
@@ -110,6 +107,6 @@ function calculateRecentTrend(responses: any[]): Array<{ date: string; averageRa
   return last30Days.map(date => ({
     date,
     averageRating: dailyStats[date]?.sum / dailyStats[date]?.count || 0,
-    responses: dailyStats[date]?.total || 0
+    responses: dailyStats[date]?.total || 0,
   }));
 }

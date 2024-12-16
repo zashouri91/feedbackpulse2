@@ -15,34 +15,30 @@ export function SignatureCard({ signature }: SignatureCardProps) {
   const handleCopy = async () => {
     const html = generateSignatureHtml({
       ...signature.style,
-      trackingCode: signature.trackingCode
+      trackingCode: signature.trackingCode,
     });
-    
+
     await navigator.clipboard.writeText(html);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+    <div className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
       <div className="p-4">
         <SignaturePreview data={signature.style} scale={0.8} />
       </div>
-      
+
       <div className="border-t border-gray-200 p-4">
-        <Button
-          variant="outline"
-          className="w-full"
-          onClick={handleCopy}
-        >
+        <Button variant="outline" className="w-full" onClick={handleCopy}>
           {copied ? (
             <>
-              <Check className="h-4 w-4 mr-2" />
+              <Check className="mr-2 h-4 w-4" />
               Copied!
             </>
           ) : (
             <>
-              <Copy className="h-4 w-4 mr-2" />
+              <Copy className="mr-2 h-4 w-4" />
               Copy HTML
             </>
           )}

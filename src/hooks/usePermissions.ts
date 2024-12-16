@@ -6,12 +6,12 @@ export function usePermissions() {
 
   const hasPermission = (permission: Permission): boolean => {
     if (!user) return false;
-    
+
     // Use custom permissions if defined
     if (user.permissions) {
       return user.permissions.includes(permission);
     }
-    
+
     // Fall back to role-based permissions
     return ROLE_PERMISSIONS[user.role].includes(permission);
   };
@@ -27,6 +27,6 @@ export function usePermissions() {
   return {
     hasPermission,
     hasAnyPermission,
-    hasAllPermissions
+    hasAllPermissions,
   };
 }

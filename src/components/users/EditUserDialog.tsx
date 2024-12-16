@@ -19,17 +19,8 @@ export function EditUserDialog({
   isLoading,
 }: EditUserDialogProps) {
   return (
-    <ConfirmDialog
-      title="Edit User"
-      isOpen={isOpen}
-      onClose={onClose}
-      showConfirm={false}
-    >
-      <UserForm
-        defaultValues={user}
-        onSubmit={onSubmit}
-        isLoading={isLoading}
-      />
+    <ConfirmDialog title="Edit User" isOpen={isOpen} onClose={onClose} showConfirm={false}>
+      <UserForm defaultValues={user} onSubmit={onSubmit} isLoading={isLoading} />
     </ConfirmDialog>
   );
 }
