@@ -2,10 +2,33 @@ import React, { useState } from 'react';
 import { Plus } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { AddUserDialog } from '../../components/users/AddUserDialog';
+import { useUsers } from '../../hooks/useUsers';
+import { EditUserDialog } from '../../components/users/EditUserDialog';
+import { ItemMenu } from '../../components/ui/ItemMenu';
 
 export default function UserList() {
   const [isAddUserOpen, setIsAddUserOpen] = useState(false);
-  const users = []; // We'll fetch this from Supabase later
+  const [editUser, setEditUser] = useState<Profile | null>(null);
+  const { users, isLoading, updateUser, deleteUser } = useUsers();
+
+  const handleEdit = async (data: Partial<Profile>) => {
+    if (!editUser) return;
+    try {
+      await updateUser(editUser.id, data);
+      setEditUser(null);
+    } catch (error) {
+      console.error('Error updating user:', error);
+    }
+  };
+
+  const handleDelete = async (user: Profile) => {
+    if (!confirm('Are you sure you want to delete this user?')) return;
+    try {
+      await deleteUser(user.id);
+    } catch (error) {
+      console.error('Error deleting user:', error);
+    }
+  };
 
   return (
     <div>
@@ -61,7 +84,27 @@ export default function UserList() {
                   ) : (
                     users.map((user) => (
                       <tr key={user.id}>
-                        {/* User row implementation will go here */}
+                        <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900">
+                          {user.firstName} {user.lastName}
+                        </td>
+                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                          {user.email}
+                        </td>
+                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                          {user.role}
+                        </td>
+                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                          {user.groupId}
+                        </td>
+                        <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                          {user.locationId}
+                        </td>
+                        <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium">
+                          <ItemMenu
+                            onEdit={() => setEditUser(user)}
+                            onDelete={() => handleDelete(user)}
+                          />
+                        </td>
                       </tr>
                     ))
                   )}
@@ -76,6 +119,16 @@ export default function UserList() {
         isOpen={isAddUserOpen}
         onClose={() => setIsAddUserOpen(false)}
       />
+      
+      {editUser && (
+        <EditUserDialog
+          user={editUser}
+          isOpen={true}
+          onClose={() => setEditUser(null)}
+          onSubmit={handleEdit}
+          isLoading={isLoading}
+        />
+      )}
     </div>
   );
 }

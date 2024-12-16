@@ -3,12 +3,28 @@ export type Role = 'admin' | 'manager' | 'user';
 export interface User {
   id: string;
   email: string;
-  name: string;
-  role: Role;
+  name: string | null;
+  role: string;
   groupId: string | null;
   locationId: string | null;
   organizationId: string;
-  permissions?: string[];
+}
+
+export interface AuthError {
+  message: string;
+  status?: number;
+}
+
+export interface AuthResponse {
+  user: User | null;
+  error: AuthError | null;
+}
+
+export interface SessionData {
+  access_token: string;
+  expires_at: number;
+  refresh_token: string;
+  user: User;
 }
 
 export interface AuthState {

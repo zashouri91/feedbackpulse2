@@ -13,13 +13,18 @@ const groupSchema = z.object({
 export type GroupFormData = z.infer<typeof groupSchema>;
 
 interface GroupFormProps {
+  defaultValues?: GroupFormData;
   onSubmit: (data: GroupFormData) => Promise<void>;
   isLoading?: boolean;
 }
 
-export function GroupForm({ onSubmit, isLoading }: GroupFormProps) {
+export function GroupForm({ defaultValues, onSubmit, isLoading }: GroupFormProps) {
   const { register, handleSubmit, formState: { errors } } = useForm<GroupFormData>({
     resolver: zodResolver(groupSchema),
+    defaultValues: defaultValues ? {
+      name: defaultValues.name,
+      description: defaultValues.description,
+    } : undefined
   });
 
   return (
@@ -31,14 +36,14 @@ export function GroupForm({ onSubmit, isLoading }: GroupFormProps) {
       />
 
       <Input
-        label="Description (Optional)"
+        label="Description"
         {...register('description')}
         error={errors.description?.message}
       />
 
       <div className="flex justify-end">
         <Button type="submit" disabled={isLoading}>
-          {isLoading ? 'Adding Group...' : 'Add Group'}
+          {isLoading ? 'Saving...' : defaultValues ? 'Save Changes' : 'Add Group'}
         </Button>
       </div>
     </form>

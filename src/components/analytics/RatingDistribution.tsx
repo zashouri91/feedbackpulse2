@@ -1,5 +1,6 @@
 import React from 'react';
 import { Bar } from 'react-chartjs-2';
+import '../../lib/chartjs';
 import type { FeedbackStats } from '../../types/feedback';
 
 interface RatingDistributionProps {

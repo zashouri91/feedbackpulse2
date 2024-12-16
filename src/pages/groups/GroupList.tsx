@@ -2,11 +2,33 @@ import React, { useState } from 'react';
 import { Plus, FolderTree } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { AddGroupDialog } from '../../components/groups/AddGroupDialog';
+import { EditGroupDialog } from '../../components/groups/EditGroupDialog';
+import { ItemMenu } from '../../components/ui/ItemMenu';
 import { useGroups } from '../../hooks/useGroups';
 
 export default function GroupList() {
   const [isAddGroupOpen, setIsAddGroupOpen] = useState(false);
-  const { groups, isLoading } = useGroups();
+  const [editGroup, setEditGroup] = useState<Group | null>(null);
+  const { groups, isLoading, updateGroup, deleteGroup } = useGroups();
+
+  const handleEdit = async (data: Partial<Group>) => {
+    if (!editGroup) return;
+    try {
+      await updateGroup(editGroup.id, data);
+      setEditGroup(null);
+    } catch (error) {
+      console.error('Error updating group:', error);
+    }
+  };
+
+  const handleDelete = async (group: Group) => {
+    if (!confirm('Are you sure you want to delete this group?')) return;
+    try {
+      await deleteGroup(group.id);
+    } catch (error) {
+      console.error('Error deleting group:', error);
+    }
+  };
 
   return (
     <div>
@@ -57,6 +79,10 @@ export default function GroupList() {
                     <p className="text-sm text-gray-500">{group.description}</p>
                   )}
                 </div>
+                <ItemMenu
+                  onEdit={() => setEditGroup(group)}
+                  onDelete={() => handleDelete(group)}
+                />
               </div>
             ))}
           </div>
@@ -67,6 +93,16 @@ export default function GroupList() {
         isOpen={isAddGroupOpen}
         onClose={() => setIsAddGroupOpen(false)}
       />
+      
+      {editGroup && (
+        <EditGroupDialog
+          group={editGroup}
+          isOpen={true}
+          onClose={() => setEditGroup(null)}
+          onSubmit={handleEdit}
+          isLoading={isLoading}
+        />
+      )}
     </div>
   );
 }

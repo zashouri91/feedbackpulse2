@@ -2,6 +2,7 @@ import React from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../../store/authStore';
 import { usePermissions } from '../../hooks/usePermissions';
+import { LoadingSpinner } from '../common/LoadingSpinner';
 import type { Permission } from '../../types/auth';
 
 interface ProtectedRouteProps {
@@ -10,14 +11,14 @@ interface ProtectedRouteProps {
 }
 
 export function ProtectedRoute({ children, permissions = [] }: ProtectedRouteProps) {
-  const { user, isLoading, isAuthenticated } = useAuthStore();
+  const { user, isLoading, isAuthenticated, isInitialized } = useAuthStore();
   const { hasAllPermissions } = usePermissions();
   const location = useLocation();
 
-  if (isLoading) {
+  if (!isInitialized || isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
+        <LoadingSpinner size="lg" />
       </div>
     );
   }

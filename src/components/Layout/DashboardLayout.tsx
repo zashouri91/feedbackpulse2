@@ -1,11 +1,14 @@
 import React from 'react';
 import { Outlet, Navigate } from 'react-router-dom';
 import { useAuthStore } from '../../store/authStore';
+import { useSidebarStore } from '../../store/sidebarStore';
 import Sidebar from './Sidebar';
 import TopBar from './TopBar';
+import { cn } from '../../utils/cn';
 
 export default function DashboardLayout() {
   const { user, isLoading, isAuthenticated } = useAuthStore();
+  const { isCollapsed } = useSidebarStore();
 
   if (isLoading) {
     return (
@@ -22,12 +25,15 @@ export default function DashboardLayout() {
   return (
     <div className="min-h-screen bg-gray-50">
       <TopBar />
-      <div className="flex">
-        <Sidebar />
-        <main className="flex-1 p-6">
+      <Sidebar />
+      <main className={cn(
+        "lg:pl-64 transition-all duration-300",
+        isCollapsed && "lg:pl-0"
+      )}>
+        <div className="max-w-7xl mx-auto p-6">
           <Outlet />
-        </main>
-      </div>
+        </div>
+      </main>
     </div>
   );
 }

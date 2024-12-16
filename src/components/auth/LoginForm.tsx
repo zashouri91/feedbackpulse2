@@ -31,8 +31,8 @@ export function LoginForm() {
         return;
       }
       navigate('/dashboard');
-    } catch (error) {
-      showToast('error', 'An unexpected error occurred');
+    } catch (error: any) {
+      showToast('error', error?.message || 'An unexpected error occurred');
       console.error('Login error:', error);
     }
   };

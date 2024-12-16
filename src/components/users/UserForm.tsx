@@ -21,6 +21,7 @@ const userSchema = z.object({
 export type UserFormData = z.infer<typeof userSchema>;
 
 interface UserFormProps {
+  defaultValues?: UserFormData;
   onSubmit: (data: UserFormData) => Promise<void>;
   isLoading?: boolean;
 }
@@ -31,12 +32,20 @@ const roles: { label: string; value: Role }[] = [
   { label: 'User', value: 'user' },
 ];
 
-export function UserForm({ onSubmit, isLoading }: UserFormProps) {
+export function UserForm({ defaultValues, onSubmit, isLoading }: UserFormProps) {
   const { groups } = useGroups();
   const { locations } = useLocations();
   
   const { register, handleSubmit, formState: { errors } } = useForm<UserFormData>({
     resolver: zodResolver(userSchema),
+    defaultValues: defaultValues ? {
+      firstName: defaultValues.firstName,
+      lastName: defaultValues.lastName,
+      email: defaultValues.email,
+      role: defaultValues.role,
+      groupId: defaultValues.groupId,
+      locationId: defaultValues.locationId,
+    } : undefined
   });
 
   return (
@@ -103,7 +112,7 @@ export function UserForm({ onSubmit, isLoading }: UserFormProps) {
 
       <div className="flex justify-end">
         <Button type="submit" disabled={isLoading}>
-          {isLoading ? 'Adding User...' : 'Add User'}
+          {isLoading ? 'Saving...' : defaultValues ? 'Save Changes' : 'Add User'}
         </Button>
       </div>
     </form>

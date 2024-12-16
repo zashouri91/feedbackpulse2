@@ -1,38 +1,46 @@
 import { create } from 'zustand';
-import type { AuthState, User } from '../types/auth';
+import { persist } from 'zustand/middleware';
+import { User } from '../types/auth';
 
-interface AuthStore extends AuthState {
+interface AuthState {
+  user: User | null;
   error: string | null;
-  isInitialized: boolean;
-  isAuthenticated: boolean;
+  loading: boolean;
   setUser: (user: User | null) => void;
-  clearUser: () => void;
-  setLoading: (isLoading: boolean) => void;
   setError: (error: string | null) => void;
-  initialize: () => void;
+  setLoading: (loading: boolean) => void;
+  clearUser: () => void;
 }
 
-export const useAuthStore = create<AuthStore>((set) => ({
-  user: null,
-  isLoading: true,
-  isInitialized: false,
-  isAuthenticated: false,
-  error: null,
-  setUser: (user) => set({ 
-    user, 
-    isLoading: false, 
-    error: null,
-    isInitialized: true,
-    isAuthenticated: !!user
-  }),
-  clearUser: () => set({ 
-    user: null, 
-    isLoading: false,
-    error: null,
-    isInitialized: true,
-    isAuthenticated: false
-  }),
-  setLoading: (isLoading: boolean) => set({ isLoading }),
-  setError: (error: string | null) => set({ error, isLoading: false }),
-  initialize: () => set({ isInitialized: true, isLoading: false })
-}));
+export const useAuthStore = create<AuthState>()(
+  persist(
+    (set) => ({
+      user: null,
+      error: null,
+      loading: true,
+      setUser: (user) => set({ user, error: null }),
+      setError: (error) => set({ error }),
+      setLoading: (loading) => set({ loading }),
+      clearUser: () => set({ user: null, error: null }),
+    }),
+    {
+      name: 'auth-storage',
+      partialize: (state) => ({ user: state.user }), // Only persist the user data
+      storage: {
+        getItem: (name) => {
+          const str = localStorage.getItem(name);
+          console.log('Auth store: Getting from storage:', name, str ? 'exists' : 'not found');
+          return str;
+        },
+        setItem: (name, value) => {
+          console.log('Auth store: Setting in storage:', name);
+          localStorage.setItem(name, value);
+        },
+        removeItem: (name) => {
+          console.log('Auth store: Removing from storage:', name);
+          localStorage.removeItem(name);
+        },
+      },
+    }
+  )
+);

@@ -7,206 +7,216 @@ import type { User } from '../types/auth';
 
 export function useAuth() {
   const navigate = useNavigate();
-  const { setUser, clearUser, setLoading, setError } = useAuthStore();
+  const { setUser, clearUser, setLoading, setError, initialize } = useAuthStore();
   const { logAction } = useAuditLog();
 
+  const fetchUserProfile = async (userId: string) => {
+    const { data: profile, error: profileError } = await supabase
+      .from('profiles')
+      .select('id, email, full_name, role, group_id, location_id, organization_id')
+      .eq('id', userId)
+      .single();
+
+    if (profileError) {
+      throw profileError;
+    }
+
+    return profile;
+  };
+
+  const createUserProfile = async (userId: string, email: string, fullName?: string) => {
+    // Create default organization
+    const { data: org, error: orgError } = await supabase
+      .from('organizations')
+      .insert({
+        name: 'My Organization',
+        domain: email?.split('@')[1]
+      })
+      .select()
+      .single();
+
+    if (orgError) {
+      throw new Error(`Failed to create organization: ${orgError.message}`);
+    }
+
+    // Create profile
+    const { data: profile, error: profileError } = await supabase
+      .from('profiles')
+      .insert({
+        id: userId,
+        email: email,
+        full_name: fullName || email?.split('@')[0],
+        role: 'admin', // First user is admin
+        organization_id: org.id
+      })
+      .select()
+      .single();
+
+    if (profileError) {
+      throw new Error(`Failed to create profile: ${profileError.message}`);
+    }
+
+    return { profile, org };
+  };
+
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+    let mounted = true;
+
+    const initializeAuth = async () => {
+      try {
         setLoading(true);
-        console.log('Auth state changed:', event, session?.user?.id);
+
+        // First try to get the session
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
         
-        if (session) {
-          try {
-            console.log('Fetching profile for user:', session.user.id);
-            
-            // First check if user has a profile
-            const { data: profile, error: profileError } = await supabase
-              .from('profiles')
-              .select('id, email, full_name, role, group_id, location_id, organization_id')
-              .eq('id', session.user.id)
-              .single();
+        if (sessionError) {
+          console.error('Error getting session:', sessionError);
+          throw sessionError;
+        }
 
-            if (profileError) {
-              console.error('Error fetching profile:', profileError);
-              
-              // If no profile exists, create one with a new organization
-              if (profileError.code === 'PGRST116') {
-                console.log('No profile found, creating new profile with organization');
-                
-                // Create default organization
-                const { data: org, error: orgError } = await supabase
-                  .from('organizations')
-                  .insert({
-                    name: 'My Organization',
-                    domain: session.user.email?.split('@')[1]
-                  })
-                  .select()
-                  .single();
-
-                if (orgError) {
-                  throw new Error(`Failed to create organization: ${orgError.message}`);
-                }
-
-                // Create profile
-                const { data: newProfile, error: newProfileError } = await supabase
-                  .from('profiles')
-                  .insert({
-                    id: session.user.id,
-                    email: session.user.email,
-                    full_name: session.user.user_metadata?.full_name || session.user.email?.split('@')[0],
-                    role: 'user',
-                    organization_id: org.id
-                  })
-                  .select()
-                  .single();
-
-                if (newProfileError) {
-                  throw new Error(`Failed to create profile: ${newProfileError.message}`);
-                }
-
-                const user: User = {
-                  id: newProfile.id,
-                  email: newProfile.email,
-                  name: newProfile.full_name,
-                  role: newProfile.role,
-                  groupId: null,
-                  locationId: null,
-                  organizationId: org.id
-                };
-                
-                setUser(user);
-                await logAction('user.create');
-                navigate('/dashboard');
-                return;
-              }
-              
-              setError(profileError.message);
-              setLoading(false);
-              return;
-            }
-
-            if (profile) {
-              const user: User = {
-                id: profile.id,
-                email: profile.email,
-                name: profile.full_name,
-                role: profile.role,
-                groupId: profile.group_id,
-                locationId: profile.location_id,
-                organizationId: profile.organization_id
-              };
-              
-              setUser(user);
-              if (event === 'SIGNED_IN') {
-                await logAction('user.login');
-                navigate('/dashboard');
-              }
-            }
-          } catch (error) {
-            console.error('Error in auth state change:', error);
-            setError(error instanceof Error ? error.message : 'An unexpected error occurred');
-            clearUser();
-          }
-        } else {
-          console.log('No session, clearing user');
-          if (event === 'SIGNED_OUT') {
-            await logAction('user.logout');
-            navigate('/login');
-          }
+        console.log('Initial session:', session?.user?.id);
+        
+        if (session?.user && mounted) {
+          await handleUserSession(session.user);
+        } else if (mounted) {
           clearUser();
         }
+      } catch (error) {
+        console.error('Error initializing auth:', error);
+        if (mounted) {
+          clearUser();
+        }
+      } finally {
+        if (mounted) {
+          initialize();
+          setLoading(false);
+        }
+      }
+    };
+
+    // Initialize auth on mount
+    initializeAuth();
+
+    // Set up auth state change listener
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (event, session) => {
+        console.log('Auth state changed:', event, session?.user?.id);
         
-        setLoading(false);
+        switch (event) {
+          case 'INITIAL_SESSION':
+            if (session?.user && mounted) {
+              await handleUserSession(session.user);
+            }
+            break;
+          case 'SIGNED_IN':
+            if (session?.user && mounted) {
+              await handleUserSession(session.user);
+            }
+            break;
+          case 'SIGNED_OUT':
+            if (mounted) {
+              clearUser();
+            }
+            break;
+          case 'TOKEN_REFRESHED':
+            if (session?.user && mounted) {
+              await handleUserSession(session.user);
+            }
+            break;
+          default:
+            console.log('Unhandled auth event:', event);
+        }
       }
     );
 
     return () => {
+      mounted = false;
       subscription.unsubscribe();
     };
-  }, [navigate, setUser, clearUser, setLoading, setError, logAction]);
+  }, []);
+
+  const handleUserSession = async (sessionUser: any) => {
+    try {
+      setLoading(true);
+      console.log('Handling user session for:', sessionUser.id);
+      let profile;
+
+      try {
+        profile = await fetchUserProfile(sessionUser.id);
+        console.log('Fetched user profile:', profile.id);
+      } catch (error: any) {
+        console.error('Error fetching profile:', error);
+        // If no profile exists, create one
+        if (error.code === 'PGRST116') {
+          console.log('Creating new profile for user:', sessionUser.id);
+          const { profile: newProfile } = await createUserProfile(
+            sessionUser.id,
+            sessionUser.email,
+            sessionUser.user_metadata?.full_name
+          );
+          profile = newProfile;
+          await logAction('user.create');
+        } else {
+          throw error;
+        }
+      }
+
+      const user: User = {
+        id: profile.id,
+        email: profile.email,
+        name: profile.full_name,
+        role: profile.role,
+        groupId: profile.group_id,
+        locationId: profile.location_id,
+        organizationId: profile.organization_id
+      };
+      
+      console.log('Setting user in store:', user.id);
+      setUser(user);
+    } catch (error) {
+      console.error('Error handling user session:', error);
+      setError(error instanceof Error ? error.message : 'Failed to handle user session');
+      clearUser();
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const signIn = async (email: string, password: string) => {
+    try {
+      setLoading(true);
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) throw error;
+      await logAction('user.login');
+      return { data, error: null };
+    } catch (error) {
+      console.error('Error signing in:', error);
+      setError(error instanceof Error ? error.message : 'Failed to sign in');
+      return { data: null, error };
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const signOut = async () => {
+    try {
+      setLoading(true);
+      await logAction('user.logout');
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      clearUser();
+      navigate('/login');
+    } catch (error) {
+      console.error('Error signing out:', error);
+      setError(error instanceof Error ? error.message : 'Failed to sign out');
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return {
-    signIn: async (email: string, password: string) => {
-      try {
-        setLoading(true);
-        console.log('Attempting sign in for:', email);
-        const { error } = await supabase.auth.signInWithPassword({
-          email,
-          password
-        });
-        if (error) {
-          console.error('Sign in error:', error);
-          setError(error.message);
-        }
-        return { error };
-      } catch (error) {
-        console.error('Unexpected sign in error:', error);
-        const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred';
-        setError(errorMessage);
-        return { error: error as any };
-      } finally {
-        setLoading(false);
-      }
-    },
-    
-    signUp: async (email: string, password: string, userData: Partial<User>) => {
-      try {
-        setLoading(true);
-        console.log('Attempting sign up for:', email);
-        const { error: signUpError, data } = await supabase.auth.signUp({
-          email,
-          password,
-          options: {
-            emailRedirectTo: `${window.location.origin}/auth/callback`,
-            data: {
-              full_name: userData.name
-            }
-          }
-        });
-
-        if (signUpError || !data.user) {
-          console.error('Sign up error:', signUpError);
-          setError(signUpError?.message || 'Failed to sign up');
-          return { error: signUpError };
-        }
-
-        // Profile will be created in the onAuthStateChange handler
-        return { error: null };
-      } catch (error) {
-        console.error('Unexpected sign up error:', error);
-        const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred';
-        setError(errorMessage);
-        return { error: error as any };
-      } finally {
-        setLoading(false);
-      }
-    },
-    
-    resetPassword: async (email: string) => {
-      return supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/auth/reset-password`
-      });
-    },
-    
-    updatePassword: async (newPassword: string) => {
-      return supabase.auth.updateUser({ password: newPassword });
-    },
-    
-    signOut: async () => {
-      try {
-        setLoading(true);
-        await logAction('user.logout');
-        await supabase.auth.signOut();
-        navigate('/login');
-      } catch (error) {
-        console.error('Error signing out:', error);
-        const errorMessage = error instanceof Error ? error.message : 'An unexpected error occurred';
-        setError(errorMessage);
-        throw error;
-      } finally {
-        setLoading(false);
-      }
-    }
+    signIn,
+    signOut
   };
 }

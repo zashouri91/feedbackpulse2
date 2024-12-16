@@ -2,11 +2,33 @@ import React, { useState } from 'react';
 import { Plus, MapPin } from 'lucide-react';
 import { Button } from '../../components/ui/Button';
 import { AddLocationDialog } from '../../components/locations/AddLocationDialog';
+import { EditLocationDialog } from '../../components/locations/EditLocationDialog';
+import { ItemMenu } from '../../components/ui/ItemMenu';
 import { useLocations } from '../../hooks/useLocations';
 
 export default function LocationList() {
   const [isAddLocationOpen, setIsAddLocationOpen] = useState(false);
-  const { locations, isLoading } = useLocations();
+  const [editLocation, setEditLocation] = useState<Location | null>(null);
+  const { locations, isLoading, updateLocation, deleteLocation } = useLocations();
+
+  const handleEdit = async (data: Partial<Location>) => {
+    if (!editLocation) return;
+    try {
+      await updateLocation(editLocation.id, data);
+      setEditLocation(null);
+    } catch (error) {
+      console.error('Error updating location:', error);
+    }
+  };
+
+  const handleDelete = async (location: Location) => {
+    if (!confirm('Are you sure you want to delete this location?')) return;
+    try {
+      await deleteLocation(location.id);
+    } catch (error) {
+      console.error('Error deleting location:', error);
+    }
+  };
 
   return (
     <div>
@@ -50,13 +72,21 @@ export default function LocationList() {
               key={location.id}
               className="relative flex flex-col space-y-2 rounded-lg border border-gray-300 bg-white p-6 shadow-sm hover:border-gray-400"
             >
-              <h3 className="text-lg font-medium text-gray-900">{location.name}</h3>
-              <p className="text-sm text-gray-500">
-                {location.address}, {location.city}
-              </p>
-              <p className="text-sm text-gray-500">
-                {location.state}, {location.country}
-              </p>
+              <div className="flex justify-between">
+                <div>
+                  <h3 className="text-lg font-medium text-gray-900">{location.name}</h3>
+                  <p className="text-sm text-gray-500">
+                    {location.address}, {location.city}
+                  </p>
+                  <p className="text-sm text-gray-500">
+                    {location.state}, {location.country}
+                  </p>
+                </div>
+                <ItemMenu
+                  onEdit={() => setEditLocation(location)}
+                  onDelete={() => handleDelete(location)}
+                />
+              </div>
             </div>
           ))
         )}
@@ -66,6 +96,16 @@ export default function LocationList() {
         isOpen={isAddLocationOpen}
         onClose={() => setIsAddLocationOpen(false)}
       />
+      
+      {editLocation && (
+        <EditLocationDialog
+          location={editLocation}
+          isOpen={true}
+          onClose={() => setEditLocation(null)}
+          onSubmit={handleEdit}
+          isLoading={isLoading}
+        />
+      )}
     </div>
   );
 }
