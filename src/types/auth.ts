@@ -1,3 +1,22 @@
+export type Role = 'admin' | 'manager' | 'user';
+
+export interface User {
+  id: string;
+  email: string;
+  name: string;
+  role: Role;
+  groupId: string | null;
+  locationId: string | null;
+  organizationId: string;
+  permissions?: string[];
+}
+
+export interface AuthState {
+  user: User | null;
+  isLoading: boolean;
+  isAuthenticated: boolean;
+}
+
 export type Permission =
   // ... existing permissions ...
   // Analytics

@@ -17,3 +17,24 @@ CREATE POLICY "Users can update their own profile"
 CREATE POLICY "Enable insert for authentication service"
   ON profiles FOR INSERT
   WITH CHECK (true);
+
+-- Add RLS policies for audit_logs table
+ALTER TABLE audit_logs ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can view audit logs in their organization"
+  ON audit_logs FOR SELECT
+  USING (
+    EXISTS (
+      SELECT 1 FROM profiles p
+      WHERE p.id = auth.uid()
+      AND p.organization_id = (
+        SELECT organization_id FROM profiles
+        WHERE id = audit_logs.user_id
+      )
+    )
+  );
+
+-- Only allow system to insert audit logs
+CREATE POLICY "System can insert audit logs"
+  ON audit_logs FOR INSERT
+  WITH CHECK (auth.uid() IS NOT NULL);

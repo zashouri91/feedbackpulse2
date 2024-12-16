@@ -19,12 +19,23 @@ export function FeedbackContainer({
   const [step, setStep] = useState<'rating' | 'followUp' | 'success'>('rating');
   const [rating, setRating] = useState<number>();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  const tracking = parseTrackingCode(trackingCode);
-  if (!tracking) {
+  let tracking;
+  try {
+    tracking = parseTrackingCode(trackingCode);
+    if (!tracking || !tracking.surveyId || !tracking.userId || !tracking.groupId || !tracking.locationId) {
+      throw new Error('Invalid tracking code format');
+    }
+  } catch (err) {
     return (
-      <div className="text-center py-12 text-red-600">
-        Invalid feedback link. Please check the URL and try again.
+      <div className="flex flex-col items-center justify-center py-12">
+        <div className="text-red-600 font-medium mb-2">
+          Invalid feedback link
+        </div>
+        <div className="text-gray-600 text-sm">
+          Please check the URL and try again. If the problem persists, contact support.
+        </div>
       </div>
     );
   }

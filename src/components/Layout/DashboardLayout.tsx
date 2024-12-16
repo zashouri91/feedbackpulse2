@@ -5,7 +5,7 @@ import Sidebar from './Sidebar';
 import TopBar from './TopBar';
 
 export default function DashboardLayout() {
-  const { isAuthenticated, isLoading } = useAuthStore();
+  const { user, isLoading, isAuthenticated } = useAuthStore();
 
   if (isLoading) {
     return (
@@ -15,7 +15,7 @@ export default function DashboardLayout() {
     );
   }
 
-  if (!isAuthenticated) {
+  if (!isAuthenticated || !user) {
     return <Navigate to="/login" replace />;
   }
 
